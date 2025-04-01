@@ -99,15 +99,16 @@ data FundHoldingDatumType = FundHoldingDatumType
     , -- Identification
       hdFundHolding_Index :: Integer -- Unique holding identifier
     , -- Fund Token Accounting
-      hdSubtotal_FT_Minted_Accumulated :: Integer -- Total FTs ever minted
-    , hdSubtotal_FT_Minted :: Integer -- Current FTs in circulation
+      hdSubTotal_FT_Minted_Accumulated :: Integer -- Total FTs ever minted
+    , hdSubTotal_FT_Minted :: Integer -- Current FTs in circulation
     , -- Commission Tracking
-      hdSubtotal_FT_Commissions :: Integer -- Available commissions
-    , hdSubtotal_FT_Commissions_Release_PerMonth_1e6 :: Integer -- Monthly release
+      hdSubTotal_FT_Commissions :: Integer -- Available commissions
+    , hdSubTotal_FT_Commissions_Total :: Integer -- Total acum commissions, for calcs
+    , hdSubTotal_FT_Commissions_Release_PerMonth_1e6 :: Integer -- Monthly release
     , -- Commission Collections
-      hdSubtotal_FT_Commissions_Collected_Protocol :: Integer -- Protocol total
-    , hdSubtotal_FT_Commissions_Collected_Managers :: Integer -- Managers total
-    , hdSubtotal_FT_Commissions_Collected_Delegators :: Integer -- Delegators total
+      hdSubTotal_FT_Commissions_Collected_Protocol :: Integer -- Protocol total
+    , hdSubTotal_FT_Commissions_Collected_Managers :: Integer -- Managers total
+    , hdSubTotal_FT_Commissions_Collected_Delegators :: Integer -- Delegators total
     , --- Minimum ADA
       hdMinADA :: Integer -- Minimum ADA used in UTXO
     }
@@ -118,13 +119,14 @@ instance Eq FundHoldingDatumType where
     ps1 == ps2 =
         hdVersion ps1 == hdVersion ps2
             && hdFundHolding_Index ps1 == hdFundHolding_Index ps2
-            && hdSubtotal_FT_Minted_Accumulated ps1 == hdSubtotal_FT_Minted_Accumulated ps2
-            && hdSubtotal_FT_Minted ps1 == hdSubtotal_FT_Minted ps2
-            && hdSubtotal_FT_Commissions ps1 == hdSubtotal_FT_Commissions ps2
-            && hdSubtotal_FT_Commissions_Release_PerMonth_1e6 ps1 == hdSubtotal_FT_Commissions_Release_PerMonth_1e6 ps2
-            && hdSubtotal_FT_Commissions_Collected_Protocol ps1 == hdSubtotal_FT_Commissions_Collected_Protocol ps2
-            && hdSubtotal_FT_Commissions_Collected_Managers ps1 == hdSubtotal_FT_Commissions_Collected_Managers ps2
-            && hdSubtotal_FT_Commissions_Collected_Delegators ps1 == hdSubtotal_FT_Commissions_Collected_Delegators ps2
+            && hdSubTotal_FT_Minted_Accumulated ps1 == hdSubTotal_FT_Minted_Accumulated ps2
+            && hdSubTotal_FT_Minted ps1 == hdSubTotal_FT_Minted ps2
+            && hdSubTotal_FT_Commissions ps1 == hdSubTotal_FT_Commissions ps2
+            && hdSubTotal_FT_Commissions_Total ps1 == hdSubTotal_FT_Commissions_Total ps2
+            && hdSubTotal_FT_Commissions_Release_PerMonth_1e6 ps1 == hdSubTotal_FT_Commissions_Release_PerMonth_1e6 ps2
+            && hdSubTotal_FT_Commissions_Collected_Protocol ps1 == hdSubTotal_FT_Commissions_Collected_Protocol ps2
+            && hdSubTotal_FT_Commissions_Collected_Managers ps1 == hdSubTotal_FT_Commissions_Collected_Managers ps2
+            && hdSubTotal_FT_Commissions_Collected_Delegators ps1 == hdSubTotal_FT_Commissions_Collected_Delegators ps2
             && hdMinADA ps1 == hdMinADA ps2
 
 instance Ord FundHoldingDatumType where
@@ -170,31 +172,33 @@ instance T.ShowDatum ValidatorDatum where
 --------------------------------------------------------------------------------2
 
 {-# INLINEABLE mkFundHolding_DatumType #-}
-mkFundHolding_DatumType :: Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> FundHoldingDatumType
+mkFundHolding_DatumType :: Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> FundHoldingDatumType
 mkFundHolding_DatumType = FundHoldingDatumType ownVersion
 
 {-# INLINEABLE mkFundHolding_Datum #-}
-mkFundHolding_Datum :: Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> ValidatorDatum
+mkFundHolding_Datum :: Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> ValidatorDatum
 mkFundHolding_Datum
     holdingIndex
-    subtotal_FT_AcumDeposits
-    subtotal_FT_Minted
-    subtotal_FT_Commissions
-    subtotal_FT_Commissions_Release_PerMonth_1e6
-    subtotal_FT_Commissions_Collected_Protocol
-    subtotal_FT_Commissions_Collected_Managers
-    subtotal_FT_Commissions_Collected_Delegators
+    subTotal_FT_AcumDeposits
+    subTotal_FT_Minted
+    subTotal_FT_Commissions
+    subTotal_FT_Commissions_Accumulated
+    subTotal_FT_Commissions_Release_PerMonth_1e6
+    subTotal_FT_Commissions_Collected_Protocol
+    subTotal_FT_Commissions_Collected_Managers
+    subTotal_FT_Commissions_Collected_Delegators
     minADA =
         FundHoldingDatum $
             mkFundHolding_DatumType
                 holdingIndex
-                subtotal_FT_AcumDeposits
-                subtotal_FT_Minted
-                subtotal_FT_Commissions
-                subtotal_FT_Commissions_Release_PerMonth_1e6
-                subtotal_FT_Commissions_Collected_Protocol
-                subtotal_FT_Commissions_Collected_Managers
-                subtotal_FT_Commissions_Collected_Delegators
+                subTotal_FT_AcumDeposits
+                subTotal_FT_Minted
+                subTotal_FT_Commissions
+                subTotal_FT_Commissions_Accumulated
+                subTotal_FT_Commissions_Release_PerMonth_1e6
+                subTotal_FT_Commissions_Collected_Protocol
+                subTotal_FT_Commissions_Collected_Managers
+                subTotal_FT_Commissions_Collected_Delegators
                 minADA
 
 mkDatum :: FundHoldingDatumType -> LedgerApiV2.Datum
@@ -373,12 +377,12 @@ PlutusTx.makeIsDataIndexed
 
 --------------------------------------------------------------------------------2
 
-newtype ValidatorRedeemerBalanceAssetsType = ValidatorRedeemerBalanceAssetsType {rbCommissionsFT :: [Integer]}
+newtype ValidatorRedeemerBalanceAssetsType = ValidatorRedeemerBalanceAssetsType {rbMoveCommissionsFT :: [Integer]}
     deriving (DataAeson.FromJSON, DataAeson.ToJSON, GHCGenerics.Generic, P.Show)
 
 instance Eq ValidatorRedeemerBalanceAssetsType where
     {-# INLINEABLE (==) #-}
-    r1 == r2 = rbCommissionsFT r1 == rbCommissionsFT r2
+    r1 == r2 = rbMoveCommissionsFT r1 == rbMoveCommissionsFT r2
 
 PlutusTx.makeIsDataIndexed
     ''ValidatorRedeemerBalanceAssetsType
@@ -445,8 +449,8 @@ PlutusTx.makeIsDataIndexed
     , ('ValidatorRedeemerDeposit, 1)
     , ('ValidatorRedeemerWithdraw, 2)
     , ('ValidatorRedeemerCollect_Protocol_Commission, 3)
-    , ('ValidatorRedeemerCollect_Managers_Commission, 5)
-    , ('ValidatorRedeemerCollect_Delegators_Commission, 4)
+    , ('ValidatorRedeemerCollect_Managers_Commission, 4)
+    , ('ValidatorRedeemerCollect_Delegators_Commission, 5)
     , ('ValidatorRedeemerReIndexing, 6)
     , ('ValidatorRedeemerBalanceAssets, 7)
     , ('ValidatorRedeemerEmergency, 8)

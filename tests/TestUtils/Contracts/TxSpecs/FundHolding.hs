@@ -572,7 +572,7 @@ fundHolding_Collect_Protocol_Commission_TxSpecs tp txParams =
             let
                 deadline = FundT.fdDeadline (input_Fund_Datum extras)
                 share = ProtocolT.pdShare_InBPx1e2_Protocol (input_Protocol_Datum extras)
-                taken =  FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol (input_FundHolding_Datum extras)
+                taken =  FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol (input_FundHolding_Datum extras)
                 ------------------
                 withdrawAmount = FundHelpers.getCommissionsAvailable deadline (input_FundHolding_Datum extras) share taken withdrawDate
                 ------------------
@@ -662,7 +662,7 @@ fundHolding_Collect_Managers_Commission_TxSpecs tp txParams =
             let
                 deadline = FundT.fdDeadline (input_Fund_Datum extras)
                 share = ProtocolT.pdShare_InBPx1e2_Managers (input_Protocol_Datum extras)
-                taken =  FundHoldingT.hdSubtotal_FT_Commissions_Collected_Managers (input_FundHolding_Datum extras)
+                taken =  FundHoldingT.hdSubTotal_FT_Commissions_Collected_Managers (input_FundHolding_Datum extras)
                 ------------------
                 withdrawAmount = FundHelpers.getCommissionsAvailable deadline (input_FundHolding_Datum extras) share taken withdrawDate
                 ------------------
@@ -751,7 +751,7 @@ fundHolding_Collect_Delegators_Commission_TxSpecs tp txParams =
             let
                 deadline = FundT.fdDeadline (input_Fund_Datum extras)
                 share = ProtocolT.pdShare_InBPx1e2_Delegators (input_Protocol_Datum extras)
-                taken =  FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators (input_FundHolding_Datum extras)
+                taken =  FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators (input_FundHolding_Datum extras)
                 ------------------
                 withdrawAmount = FundHelpers.getCommissionsAvailable deadline (input_FundHolding_Datum extras) share taken withdrawDate
                 ------------------

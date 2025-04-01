@@ -333,11 +333,11 @@ prop_withdraw_burnExpectedFT tp selectedRedeemer ctxParametrizable (IntegerPlusZ
         --------------------
         results <- testContextWrapper tp ctx'
         --------------------
-        if commissions_FT_Release_PerMonth_1e6 >= FundHoldingT.hdSubtotal_FT_Commissions_Release_PerMonth_1e6 input_FundHolding_Datum then
+        if commissions_FT_Release_PerMonth_1e6 >= FundHoldingT.hdSubTotal_FT_Commissions_Release_PerMonth_1e6 input_FundHolding_Datum then
                 assertResultsContainAnyOf (Just selectedRedeemer, results)
                 ["not isEnough_Commissions_Release_PerMonth"]
         else
-            if commissionsForUserFTToGetBack >= FundHoldingT.hdSubtotal_FT_Commissions input_FundHolding_Datum then
+            if commissionsForUserFTToGetBack >= FundHoldingT.hdSubTotal_FT_Commissions input_FundHolding_Datum then
                 assertResultsContainAnyOf (Just selectedRedeemer, results)
                 ["not isEnough_FT_ForComission"]
             else if withdrawPlusCommissionsGetBack /= burnAmount' then
@@ -438,7 +438,7 @@ prop_withdraw_takeExpectedValue tp selectedRedeemer ctxParametrizable =
             if LedgerApiV2.txOutValue output_FundHolding_UTxO
                     /= (LedgerApiV2.txOutValue input_FundHolding_UTxO <> negate investUnit_Value <> negate (LedgerApiV2.singleton (tpFundPolicy_CS tp) (tpFundFT_TN tp) commissionsForUserFTToGetBack)) then
                 assertResultsContainAnyOf (Just selectedRedeemer, results)
-                ["not isCorrect_Output_FundHolding_Value_Without_Tokens_And_FT_for_Commissions"]
+                ["wrong output value"]
             else
                 assertResultsContainAnyOf (Just selectedRedeemer, results) []
 
@@ -466,12 +466,12 @@ prop_commissions_protocolSignatories tp selectedRedeemer ctx =
                             FundHoldingT.mkDatum $
                                 fundHoldingDatumType'
                                     {
-                                        FundHoldingT.hdSubtotal_FT_Commissions =
-                                        FundHoldingT.hdSubtotal_FT_Commissions
+                                        FundHoldingT.hdSubTotal_FT_Commissions =
+                                        FundHoldingT.hdSubTotal_FT_Commissions
                                             fundHoldingDatumType'
                                             - withdraw'
-                                    , FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol =
-                                        FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol
+                                    , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol =
+                                        FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol
                                             fundHoldingDatumType'
                                             + withdraw'
                                     }
@@ -507,12 +507,12 @@ prop_commissions_fundAdminSignatories tp selectedRedeemer ctx =
                         LedgerApiV2.OutputDatum $
                             FundHoldingT.mkDatum $
                                 fundHoldingDatumType'
-                                    { FundHoldingT.hdSubtotal_FT_Commissions =
-                                        FundHoldingT.hdSubtotal_FT_Commissions
+                                    { FundHoldingT.hdSubTotal_FT_Commissions =
+                                        FundHoldingT.hdSubTotal_FT_Commissions
                                             fundHoldingDatumType'
                                             - withdraw'
-                                    , FundHoldingT.hdSubtotal_FT_Commissions_Collected_Managers =
-                                        FundHoldingT.hdSubtotal_FT_Commissions_Collected_Managers
+                                    , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Managers =
+                                        FundHoldingT.hdSubTotal_FT_Commissions_Collected_Managers
                                             fundHoldingDatumType'
                                             + withdraw'
                                     }
@@ -549,12 +549,12 @@ prop_commissions_delegator_zeroOrLess tp selectedRedeemer ctx =
                         LedgerApiV2.OutputDatum $
                             FundHoldingT.mkDatum $
                                 fundHoldingDatumType'
-                                    { FundHoldingT.hdSubtotal_FT_Commissions =
-                                        FundHoldingT.hdSubtotal_FT_Commissions
+                                    { FundHoldingT.hdSubTotal_FT_Commissions =
+                                        FundHoldingT.hdSubTotal_FT_Commissions
                                             fundHoldingDatumType'
                                             - withdraw'
-                                    , FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators =
-                                        FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators
+                                    , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators =
+                                        FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators
                                             fundHoldingDatumType'
                                             + withdraw'
                                     }
@@ -589,12 +589,12 @@ prop_commissions_delegator_positive tp selectedRedeemer ctx =
                         LedgerApiV2.OutputDatum $
                             FundHoldingT.mkDatum $
                                 fundHoldingDatumType'
-                                    { FundHoldingT.hdSubtotal_FT_Commissions =
-                                        FundHoldingT.hdSubtotal_FT_Commissions
+                                    { FundHoldingT.hdSubTotal_FT_Commissions =
+                                        FundHoldingT.hdSubTotal_FT_Commissions
                                             fundHoldingDatumType'
                                             - withdraw'
-                                    , FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators =
-                                        FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators
+                                    , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators =
+                                        FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators
                                             fundHoldingDatumType'
                                             + withdraw'
                                     }
@@ -645,12 +645,12 @@ prop_commissions_delegator_moreThanAvailable tp selectedRedeemer ctx =
                         LedgerApiV2.OutputDatum $
                             FundHoldingT.mkDatum $
                                 fundHoldingDatumType'
-                                    { FundHoldingT.hdSubtotal_FT_Commissions =
-                                        FundHoldingT.hdSubtotal_FT_Commissions
+                                    { FundHoldingT.hdSubTotal_FT_Commissions =
+                                        FundHoldingT.hdSubTotal_FT_Commissions
                                             fundHoldingDatumType'
                                             - withdraw'
-                                    , FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators =
-                                        FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators
+                                    , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators =
+                                        FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators
                                             fundHoldingDatumType'
                                             + withdraw'
                                     }

@@ -267,6 +267,8 @@ test-suite UnitTests
   main-is:        Main.hs
   hs-source-dirs: tests/Tests/UnitTests tests
   other-modules:
+    Contracts.Delegation.MintingPolicy
+    Contracts.Delegation.Validator
     Contracts.Fund.Holding.MintingPolicy
     Contracts.Fund.Holding.Validator
     Contracts.Fund.MintingPolicy
@@ -281,6 +283,7 @@ test-suite UnitTests
     TestTree.Values
     TestUtils.Constants
     TestUtils.Contracts.InitialData
+    TestUtils.Contracts.TxContext.Delegation
     TestUtils.Contracts.TxContext.Fund
     TestUtils.Contracts.TxContext.FundHolding
     TestUtils.Contracts.TxContext.InvestUnit

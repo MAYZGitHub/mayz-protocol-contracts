@@ -62,8 +62,8 @@ menuEndPoints name _ (walletNro, _) protocolPABParams fundPABParams' _ _  = do
     MonadIOClass.liftIO $ P.putStrLn "--------------------------------"
     Monad.when (DataMaybe.isJust fundPABParams' && (isProtocolAdmin || isMAYZHolderAdmin || isThisFundAdmin)) $ do
         Monad.when isProtocolAdmin $ do MonadIOClass.liftIO $ P.putStrLn "31 - Withdraw Protocol commissions"
-        Monad.when isMAYZHolderAdmin $ do MonadIOClass.liftIO $ P.putStrLn "32 - Withdraw MAYZ Holder commissions"
-        Monad.when isThisFundAdmin $ do MonadIOClass.liftIO $ P.putStrLn "33 - Withdraw Fund commissions"
+        Monad.when isThisFundAdmin $ do MonadIOClass.liftIO $ P.putStrLn "32 - Withdraw Managers commissions"
+        Monad.when isMAYZHolderAdmin $ do MonadIOClass.liftIO $ P.putStrLn "33 - Withdraw Delegators commissions"
         MonadIOClass.liftIO $ P.putStrLn "--------------------------------"
     MonadIOClass.liftIO $ P.putStrLn "0  - Return to Main Menu"
     MonadIOClass.liftIO $ P.putStrLn "99 - Exit"
@@ -95,10 +95,10 @@ pabMainLoop isAdminMenu (walletNro, walletCount) protocolPABParams fundPABParams
         "31" ->
             pabFundCollect_Protocol_Commission isAdminMenu (walletNro, walletCount) protocolPABParams fundPABParams' pabReturnToMainMenu pabShutdown
         "32" ->
-            pabFundCollect_Delegators_Commission isAdminMenu (walletNro, walletCount) protocolPABParams fundPABParams' pabReturnToMainMenu pabShutdown
-        "33" ->
             pabFundCollect_Managers_Commission isAdminMenu (walletNro, walletCount) protocolPABParams fundPABParams' pabReturnToMainMenu pabShutdown
-
+        "33" ->
+            pabFundCollect_Delegators_Commission isAdminMenu (walletNro, walletCount) protocolPABParams fundPABParams' pabReturnToMainMenu pabShutdown
+      
         "81" -> do
             PABHelpers.pabBalances (Just walletNro, walletCount) (Just protocolPABParams)
             pabMainLoop isAdminMenu (walletNro, walletCount) protocolPABParams fundPABParams' pabReturnToMainMenu pabShutdown

@@ -129,12 +129,12 @@ fundHolding_Validator_Redeemer_Deposit_Tests tp =
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
                         `assertResultsContainAnyOf` ["not isMintingFT"]
-                , Tasty.testCase "Depositing without increasing FT minted subtotal must fail" $ do
+                , Tasty.testCase "Depositing without increasing FT minted subTotal must fail" $ do
                     let
                         modifiedDatumType =
                             (fundHolding_DatumType_With_Deposits_MockData tp)
-                                { FundHoldingT.hdSubtotal_FT_Minted =
-                                    FundHoldingT.hdSubtotal_FT_Minted (fundHolding_DatumType_With_NoDeposits_MockData tp)
+                                { FundHoldingT.hdSubTotal_FT_Minted =
+                                    FundHoldingT.hdSubTotal_FT_Minted (fundHolding_DatumType_With_NoDeposits_MockData tp)
                                 }
                         modifiedUTxO =
                             (fundHolding_UTxO_With_Deposits_MockData tp)
@@ -146,7 +146,7 @@ fundHolding_Validator_Redeemer_Deposit_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Datum_With_Deposit"]
+                        `assertResultsContainAnyOf` ["wrong output datum"]
                 , Tasty.testCase "Depositing without paying invest units must fail" $ do
                     let
                         (_, commissionsFT_MockData, _) = calculateDepositCommissionsUsingMonths_ tp (tpDepositDate tp) deposit_MockData
@@ -162,7 +162,7 @@ fundHolding_Validator_Redeemer_Deposit_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Value_With_Tokens_And_FT"]
+                        `assertResultsContainAnyOf` ["wrong output value"]
                 , Tasty.testCase "Depositing date outside valid range must fail" $ do
                     let
                         -- valid range for tx is created with tpDepositDate as date, and then subs and adds hald of valid time
@@ -173,7 +173,7 @@ fundHolding_Validator_Redeemer_Deposit_Tests tp =
                                 |> setInputsAndAddRedeemers [(fundHolding_UTxO_With_NoDeposits_MockData tp, FundHoldingT.mkDepositRedeemer (tpDepositDate tp + T.validTxTimeRange) deposit_MockData)]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isDateInRange"]
+                        `assertResultsContainAnyOf` ["wrong date"]
                 , Tasty.testCase "Depositing with invalid range must fail" $ do
                     let
                         ctx' = ctx |> setValidyRange (createInValidRange (tpDepositDate tp))
@@ -224,12 +224,12 @@ fundHolding_Validator_Redeemer_Withdraw_Tests tp =
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
                         `assertResultsContainAnyOf` ["not isBurningFT"]
-                , Tasty.testCase "Withdrawing without updating FT minted subtotal must fail" $ do
+                , Tasty.testCase "Withdrawing without updating FT minted subTotal must fail" $ do
                     let
                         modifiedDatumType =
                             (fundHolding_DatumType_With_Withdraw_MockData tp)
-                                { FundHoldingT.hdSubtotal_FT_Minted =
-                                    FundHoldingT.hdSubtotal_FT_Minted (fundHolding_DatumType_With_Deposits_MockData tp)
+                                { FundHoldingT.hdSubTotal_FT_Minted =
+                                    FundHoldingT.hdSubTotal_FT_Minted (fundHolding_DatumType_With_Deposits_MockData tp)
                                 }
                         modifiedUTxO =
                             (fundHolding_UTxO_With_Withdraw_MockData tp)
@@ -241,7 +241,7 @@ fundHolding_Validator_Redeemer_Withdraw_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Datum_With_Withdraw"]
+                        `assertResultsContainAnyOf` ["wrong output datum"]
                 , Tasty.testCase "Withdrawing without user recovering commissions must fail" $ do
                     let
                         !investUnit_Granularity = OnChainHelpers.getDecimalsInInvestUnit (T.iuValues investUnit_Initial)
@@ -258,7 +258,7 @@ fundHolding_Validator_Redeemer_Withdraw_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Value_Without_Tokens_And_FT_for_Commissions"]
+                        `assertResultsContainAnyOf` ["wrong output value"]
                 ]
 
 --------------------------------------------------------------------------------
@@ -287,8 +287,8 @@ fundHolding_Validator_Redeemer_Collect_Protocol_Commission_Tests tp =
                     let
                         modifiedDatumType =
                             (fundHolding_DatumType_With_Deposits_MockData tp)
-                                { FundHoldingT.hdSubtotal_FT_Commissions =
-                                    FundHoldingT.hdSubtotal_FT_Commissions (fundHolding_DatumType_With_Deposits_MockData tp)
+                                { FundHoldingT.hdSubTotal_FT_Commissions =
+                                    FundHoldingT.hdSubTotal_FT_Commissions (fundHolding_DatumType_With_Deposits_MockData tp)
                                 }
                         modifiedUTxO =
                             (fundHolding_UTxO_With_Collected_Protocol tp withdraw_Commissions_MockData)
@@ -300,7 +300,7 @@ fundHolding_Validator_Redeemer_Collect_Protocol_Commission_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Datum_With_Collect_Protocol_Commission"]
+                        `assertResultsContainAnyOf` ["wrong output datum"]
                 , Tasty.testCase "Collecting commissions without updating FundHolding value must fail" $ do
                     let
                         modifiedUTxO =
@@ -313,10 +313,10 @@ fundHolding_Validator_Redeemer_Collect_Protocol_Commission_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Value_Without_FT_for_Commissions"]
+                        `assertResultsContainAnyOf` ["wrong output value"]
                 , Tasty.testCase "Trying to collect more commissions than the available must fail" $ do
                     let
-                        available = FundHelpers.getCommissionsAvailable (tpDeadline tp) (fundHolding_DatumType_With_Deposits_MockData tp) (tpShare_InBPx1e2_Protocol tp) (FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol (fundHolding_DatumType_With_Deposits_MockData tp)) (tpCollectCommissionsDate tp)
+                        available = FundHelpers.getCommissionsAvailable (tpDeadline tp) (fundHolding_DatumType_With_Deposits_MockData tp) (tpShare_InBPx1e2_Protocol tp) (FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol (fundHolding_DatumType_With_Deposits_MockData tp)) (tpCollectCommissionsDate tp)
                         withdraw_Commissions_MockData' = available + 1
                         ctx' =
                             ctx
@@ -340,7 +340,7 @@ fundHolding_Validator_Redeemer_Collect_Protocol_Commission_Tests tp =
                                 |> setValidyRange (Ledger.interval 0 300_000)
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isDateInRange"]
+                        `assertResultsContainAnyOf` ["wrong date"]
                 ]
 
 fundHolding_Validator_Redeemer_Collect_Managers_Commission_Tests :: TestParams -> Tasty.TestTree
@@ -367,8 +367,8 @@ fundHolding_Validator_Redeemer_Collect_Managers_Commission_Tests tp =
                     let
                         modifiedDatumType =
                             (fundHolding_DatumType_With_Deposits_MockData tp)
-                                { FundHoldingT.hdSubtotal_FT_Commissions =
-                                    FundHoldingT.hdSubtotal_FT_Commissions (fundHolding_DatumType_With_Deposits_MockData tp)
+                                { FundHoldingT.hdSubTotal_FT_Commissions =
+                                    FundHoldingT.hdSubTotal_FT_Commissions (fundHolding_DatumType_With_Deposits_MockData tp)
                                 }
                         modifiedUTxO =
                             (fundHolding_UTxO_With_Collected_Managers tp withdraw_Commissions_MockData)
@@ -380,7 +380,7 @@ fundHolding_Validator_Redeemer_Collect_Managers_Commission_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Datum_With_Collect_Managers_Commission"]
+                        `assertResultsContainAnyOf` ["wrong output datum"]
                 , Tasty.testCase "Collecting commissions without updating FundHolding value must fail" $ do
                     let
                         modifiedUTxO =
@@ -396,10 +396,10 @@ fundHolding_Validator_Redeemer_Collect_Managers_Commission_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Value_Without_FT_for_Commissions"]
+                        `assertResultsContainAnyOf` ["wrong output value"]
                 , Tasty.testCase "Trying to collect more commissions than the available must fail" $ do
                     let
-                        available = FundHelpers.getCommissionsAvailable (tpDeadline tp) (fundHolding_DatumType_With_Deposits_MockData tp) (tpShare_InBPx1e2_Managers tp) (FundHoldingT.hdSubtotal_FT_Commissions_Collected_Managers (fundHolding_DatumType_With_Deposits_MockData tp)) (tpCollectCommissionsDate tp)
+                        available = FundHelpers.getCommissionsAvailable (tpDeadline tp) (fundHolding_DatumType_With_Deposits_MockData tp) (tpShare_InBPx1e2_Managers tp) (FundHoldingT.hdSubTotal_FT_Commissions_Collected_Managers (fundHolding_DatumType_With_Deposits_MockData tp)) (tpCollectCommissionsDate tp)
                         withdraw_Commissions_MockData' = available + 1
                         ctx' =
                             ctx
@@ -423,7 +423,7 @@ fundHolding_Validator_Redeemer_Collect_Managers_Commission_Tests tp =
                                 |> setValidyRange (Ledger.interval 0 300_000)
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isDateInRange"]
+                        `assertResultsContainAnyOf` ["wrong date"]
                 ]
 
 fundHolding_Validator_Redeemer_Collect_Delegators_Commission_Tests :: TestParams -> Tasty.TestTree
@@ -450,8 +450,8 @@ fundHolding_Validator_Redeemer_Collect_Delegators_Commission_Tests tp =
                     let
                         modifiedDatumType =
                             (fundHolding_DatumType_With_Deposits_MockData tp)
-                                { FundHoldingT.hdSubtotal_FT_Commissions =
-                                    FundHoldingT.hdSubtotal_FT_Commissions (fundHolding_DatumType_With_Deposits_MockData tp)
+                                { FundHoldingT.hdSubTotal_FT_Commissions =
+                                    FundHoldingT.hdSubTotal_FT_Commissions (fundHolding_DatumType_With_Deposits_MockData tp)
                                 }
                         modifiedUTxO =
                             (fundHolding_UTxO_With_Collected_Delegators tp withdraw_Commissions_MockData)
@@ -463,7 +463,7 @@ fundHolding_Validator_Redeemer_Collect_Delegators_Commission_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Datum_With_Collect_Delegators_Commission"]
+                        `assertResultsContainAnyOf` ["wrong output datum"]
                 , Tasty.testCase "Collecting commissions without updating FundHolding value must fail" $ do
                     let
                         modifiedUTxO =
@@ -476,10 +476,10 @@ fundHolding_Validator_Redeemer_Collect_Delegators_Commission_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Value_Without_FT_for_Commissions"]
+                        `assertResultsContainAnyOf` ["wrong output value"]
                 , Tasty.testCase "Trying to collect more commissions than the available must fail" $ do
                     let
-                        available = FundHelpers.getCommissionsAvailable (tpDeadline tp) (fundHolding_DatumType_With_Deposits_MockData tp) (tpShare_InBPx1e2_Delegators tp) (FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators (fundHolding_DatumType_With_Deposits_MockData tp)) (tpCollectCommissionsDate tp)
+                        available = FundHelpers.getCommissionsAvailable (tpDeadline tp) (fundHolding_DatumType_With_Deposits_MockData tp) (tpShare_InBPx1e2_Delegators tp) (FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators (fundHolding_DatumType_With_Deposits_MockData tp)) (tpCollectCommissionsDate tp)
                         withdraw_Commissions_MockData' = available + 1
                         ctx' =
                             ctx
@@ -503,7 +503,7 @@ fundHolding_Validator_Redeemer_Collect_Delegators_Commission_Tests tp =
                                 |> setValidyRange (Ledger.interval 0 300_000)
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isDateInRange"]
+                        `assertResultsContainAnyOf` ["wrong date"]
                 ]
 
 --------------------------------------------------------------------------------
@@ -567,8 +567,8 @@ fundHolding_Validator_Redeemer_ReIndexing_Tests tp =
                     let
                         modifiedDatumType =
                             (fundHolding_DatumType_With_Deposits_MockData tp)
-                                { FundHoldingT.hdSubtotal_FT_Commissions =
-                                    FundHoldingT.hdSubtotal_FT_Commissions (fundHolding_DatumType_With_Deposits_MockData tp) + 1
+                                { FundHoldingT.hdSubTotal_FT_Commissions =
+                                    FundHoldingT.hdSubTotal_FT_Commissions (fundHolding_DatumType_With_Deposits_MockData tp) + 1
                                 }
                         modifiedUTxO =
                             (fundHolding_UTxO_After_Reidx_MockData tp investUnit_Initial investUnit_AfterReIdx)
@@ -580,7 +580,7 @@ fundHolding_Validator_Redeemer_ReIndexing_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Datum_NotChanged"]
+                        `assertResultsContainAnyOf` ["wrong output datum"]
                 , Tasty.testCase "Not updating the FundHolding value must fail" $ do
                     let
                         modifiedUTxO =
@@ -592,7 +592,7 @@ fundHolding_Validator_Redeemer_ReIndexing_Tests tp =
                                 |> setOutputs [modifiedUTxO]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Value_WithTokensExchanged"]
+                        `assertResultsContainAnyOf` ["wrong output value"]
                 , Tasty.testCase "Having an incorrect redeemer for the Invest Unit validator must fail" $ do
                     let
                         ctx' =
@@ -634,16 +634,16 @@ fundHolding_Validator_Redeemer_BalanceAssets_Tests tp =
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, deposit_MockData] [100, -99] [0, 0] False []
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Output_FundHolding_Values_SameTotal"]
-                , Tasty.testCase "Balancing assets from fst input with zero deposits to other correctly must fail" $ do
-                    -- para el calculo y control del movimiento de comisiones, se necesita un deposito previo en la primer input
-                    -- es una restriccion de simplificacion y siempre se puede armar la misma tx usando la primer input como segunda y viceversa
-                    let
-                        ctx' = fundHolding_BalanceAssets_TxContext tp [0, deposit_MockData] [100, -100] [0, 0] False []
-                    results <- testContextWrapper tp ctx'
-                    (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["Expected oldCommissions firts input to be greater than 0"]
-                , Tasty.testCase "Balancing assets from fst input with depositos to other with zero correctly must succeed" $ do
+                        `assertResultsContainAnyOf` ["wrong outputs values"]
+                , -- , Tasty.testCase "Balancing assets from fst input with zero deposits to other correctly must fail" $ do
+                  --     -- para el calculo y control del movimiento de comisiones, se necesita un deposito previo en la primer input
+                  --     -- es una restriccion de simplificacion y siempre se puede armar la misma tx usando la primer input como segunda y viceversa
+                  --     let
+                  --         ctx' = fundHolding_BalanceAssets_TxContext tp [0, deposit_MockData] [100, -100] [0, 0] False []
+                  --     results <- testContextWrapper tp ctx'
+                  --     (Just selectedRedeemer, results)
+                  --         `assertResultsContainAnyOf` ["Expected oldCommissions firts input to be greater than 0"]
+                  Tasty.testCase "Balancing assets from fst input with deposits to other with zero correctly must succeed" $ do
                     let
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, 0] [-100, 100] [0, 0] False []
                     results <- testContextWrapper tp ctx'
@@ -655,9 +655,15 @@ fundHolding_Validator_Redeemer_BalanceAssets_Tests tp =
                     results <- testContextWrapper tp ctx'
                     (Nothing, results)
                         `assertResultsContainAnyOf` []
-                , Tasty.testCase "Balancing deposits and commissions FT correctly release must succeed" $ do
+                , Tasty.testCase "Balancing deposits and commissions FT neg snd correctly release must succeed" $ do
                     let
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, deposit_MockData] [100, -100] [1000000, -1000000] False []
+                    results <- testContextWrapper tp ctx'
+                    (Nothing, results)
+                        `assertResultsContainAnyOf` []
+                , Tasty.testCase "Balancing deposits and commissions FT neg fst correctly release must succeed" $ do
+                    let
+                        ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, deposit_MockData] [100, -100] [-1000000, 1000000] False []
                     results <- testContextWrapper tp ctx'
                     (Nothing, results)
                         `assertResultsContainAnyOf` []
@@ -668,7 +674,7 @@ fundHolding_Validator_Redeemer_BalanceAssets_Tests tp =
                         -- rate = 221244444444
                         -- con un cambio de [1000000, -1000000]
                         -- deberia generarse un cambio [332355555554, 110133333334]
-                        -- eso lo saco del caso de testeo anterior, usando testContextWrapperTrace y leyendo el contexto.
+                        -- eso lo saco del caso de testeo anterior, usando testContextWrapperTrace y leyendo el contexto. me fijo en los datums in y out, y aca pongo la dif
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, deposit_MockData] [100, -100] [1000000, -1000000] True [332355555554, 110133333334]
                     results <- testContextWrapper tp ctx'
                     (Nothing, results)
@@ -687,54 +693,78 @@ fundHolding_Validator_Redeemer_BalanceAssets_Tests tp =
                   --     results <- testContextWrapperTrace tp ctx'
                   --     (Nothing, results)
                   --         `assertResultsContainAnyOf` []
-                  Tasty.testCase "Balancing a ALL deposits and LITLE MORE commissions FT correctly release must fail" $ do
+                  Tasty.testCase "Balancing a ALL deposits and LITLE MORE commissions FT release must fail" $ do
                     let
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, 0] [-deposit_MockData, deposit_MockData] [-1991200 - 1, 1991200 + 1] False []
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect newCommissions >=0 and newRelease >=0"]
+                        `assertResultsContainAnyOf` ["wrong datums values"]
+                ,  Tasty.testCase "Balancing a ALL deposits and commissions FT from non deposits utxo release must fail" $ do
+                    let
+                        ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, 0] [-deposit_MockData, deposit_MockData] [100, -100] False []
+                    results <- testContextWrapper tp ctx'
+                    (Just selectedRedeemer, results)
+                        `assertResultsContainAnyOf` ["Expected Commissions to take bigger than 0"]
+                ,  Tasty.testCase "Balancing a ALL deposits and commissions FT from non deposits utxo release must fail" $ do
+                    let
+                        ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, 1] [-deposit_MockData, deposit_MockData] [100, -100] False []
+                    results <- testContextWrapper tp ctx'
+                    (Just selectedRedeemer, results)
+                        `assertResultsContainAnyOf` ["wrong datums values"]
+                 ,  Tasty.testCase "Balancing a ALL deposits and commissions FT from non deposits utxo release must fail" $ do
+                    let
+                        ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, 100] [-deposit_MockData, deposit_MockData] [100, -100] False []
+                    results <- testContextWrapper tp ctx'
+                    (Just selectedRedeemer, results)
+                        `assertResultsContainAnyOf` ["wrong datums values"]
+                 ,  Tasty.testCase "Balancing a ALL deposits and commissions FT from deposits utxo release must succeed" $ do
+                    let
+                        ctx' = fundHolding_BalanceAssets_TxContext tp [0, deposit_MockData] [deposit_MockData, -deposit_MockData] [100, -100] False []
+                    results <- testContextWrapper tp ctx'
+                    (Nothing, results)
+                        `assertResultsContainAnyOf` []
                 , Tasty.testCase "Balancing deposits and commissions FT using incorrect custom release 1 per month must fail" $ do
                     let
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, deposit_MockData] [100, -100] [1000000, -1000000] True [332355555553, 110133333334]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Outputs_FundHoldingDatums_With_UpdatedCommissionsAndRate"]
+                        `assertResultsContainAnyOf` ["wrong outputs datums"]
                 , Tasty.testCase "Balancing deposits and commissions FT using incorrect custom release 2 per month must fail" $ do
                     let
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, deposit_MockData] [100, -100] [1000000, -1000000] True [332355555554, 110133333333]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Outputs_FundHoldingDatums_With_UpdatedCommissionsAndRate"]
+                        `assertResultsContainAnyOf` ["wrong outputs datums"]
                 , Tasty.testCase "Balancing deposits and commissions FT using incorrect custom release 3 per month must fail" $ do
                     let
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, deposit_MockData] [100, -100] [1000001, -1000001] True [332355555554, 110133333334]
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Outputs_FundHoldingDatums_With_UpdatedCommissionsAndRate"]
+                        `assertResultsContainAnyOf` ["wrong outputs datums"]
                 , Tasty.testCase "Incorrect redeemer with more items in commissions list must fail" $ do
                     let
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, deposit_MockData] [deposit_MockData, deposit_MockData] [0, 0, 0] False []
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not len alterCommissionsFT == cantOutputs"]
+                        `assertResultsContainAnyOf` ["wrong inputs, outputs, redeemers len"]
                 , Tasty.testCase "Incorrect redeemer with less items in commissions list invalid must fail" $ do
                     let
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, deposit_MockData] [deposit_MockData, deposit_MockData] [0] False []
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not len alterCommissionsFT == cantOutputs"]
+                        `assertResultsContainAnyOf` ["wrong inputs, outputs, redeemers len"]
                 , Tasty.testCase "Incorrect redeemer with sum total of commision not zero (plus zero) must fail" $ do
                     let
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, deposit_MockData] [deposit_MockData, deposit_MockData] [1, 0] False []
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Outputs_Commissions_SameTotal"]
+                        `assertResultsContainAnyOf` ["wrong redeemers move FT total"]
                 , Tasty.testCase "Incorrect redeemer with sum total of commision not zero (less zero) must fail" $ do
                     let
                         ctx' = fundHolding_BalanceAssets_TxContext tp [deposit_MockData, deposit_MockData] [deposit_MockData, deposit_MockData] [-1, 0] False []
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
-                        `assertResultsContainAnyOf` ["not isCorrect_Outputs_Commissions_SameTotal"]
+                        `assertResultsContainAnyOf` ["wrong redeemers move FT total"]
                 ]
 
 --------------------------------------------------------------------------------

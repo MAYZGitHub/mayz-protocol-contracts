@@ -153,14 +153,14 @@ Unit Tests
         TX NAME: Fund_Deposit_Tx - REDEEMER: FundHolding_Deposit - Tests
           Depositing correctly must succeed:                                               OK (0.04s)
           Depositing without minting FT must fail:                                         OK (0.03s)
-          Depositing without increasing FT minted subtotal must fail:                      OK (0.03s)
+          Depositing without increasing FT minted subTotal must fail:                      OK (0.03s)
           Depositing without paying invest units must fail:                                OK (0.03s)
           Depositing date outside valid range must fail:                                   OK (0.03s)
           Depositing with invalid range must fail:                                         OK (0.03s)
         TX NAME: Fund_Withdraw_Tx - REDEEMER: FundHolding_Withdraw - Tests
           Withdrawing correctly must succeed:                                              OK (0.03s)
           Withdrawing without burning FT must fail:                                        OK (0.03s)
-          Withdrawing without updating FT minted subtotal must fail:                       OK (0.03s)
+          Withdrawing without updating FT minted subTotal must fail:                       OK (0.03s)
           Withdrawing without user recovering commissions must fail:                       OK (0.03s)
         TX NAME: FundHolding_Collect_Protocol_Commission_Tx - REDEEMER: FundHolding_Collect_Protocol_Commission - Tests
           Collecting commissions correctly must succeed:                                   OK (0.02s)

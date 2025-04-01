@@ -152,8 +152,8 @@ pabProtocolPrepare (walletNro, walletCount) protocolPABParams pabReturnToMainMen
     fundCategories <- MonadIOClass.liftIO promptFundCategories
     ---------------------
     share_InBPx1e2_Protocol <- MonadIOClass.liftIO  $ CLIHelpers.getIntWithDefault "Protocol share (1pb = 0.01% / 10,000pb = 100%)" 333_400
-    share_InBPx1e2_Managers <- MonadIOClass.liftIO  $ CLIHelpers.getIntWithDefault "Admins share (1pb = 0.01% / 10,000pb = 100%)" 333_300
-    share_InBPx1e2_Delegators <- MonadIOClass.liftIO  $ CLIHelpers.getIntWithDefault "MAYZ share (1pb = 0.01% / 10,000pb = 100%)" 333_300
+    share_InBPx1e2_Managers <- MonadIOClass.liftIO  $ CLIHelpers.getIntWithDefault "Managers share (1pb = 0.01% / 10,000pb = 100%)" 333_300
+    share_InBPx1e2_Delegators <- MonadIOClass.liftIO  $ CLIHelpers.getIntWithDefault "Delegators share (1pb = 0.01% / 10,000pb = 100%)" 333_300
     ---------------------
     let contract =
             PABContracts.PABProtocolPrepare
@@ -244,8 +244,8 @@ pabProtocolUpdate (walletNro, walletCount) protocolPABParams pabReturnToMainMenu
             fundCategories <- MonadIOClass.liftIO promptFundCategories
             ---------------------
             share_InBPx1e2_Protocol <- MonadIOClass.liftIO  $ CLIHelpers.getIntWithDefault "Protocol share (1pb = 0.01% / 10,000pb = 100%)" 333_400
-            share_InBPx1e2_Managers <- MonadIOClass.liftIO  $ CLIHelpers.getIntWithDefault "Admins share (1pb = 0.01% / 10,000pb = 100%)" 333_300
-            share_InBPx1e2_Delegators <- MonadIOClass.liftIO  $ CLIHelpers.getIntWithDefault "MAYZ share (1pb = 0.01% / 10,000pb = 100%)" 333_300
+            share_InBPx1e2_Managers <- MonadIOClass.liftIO  $ CLIHelpers.getIntWithDefault "Managers share (1pb = 0.01% / 10,000pb = 100%)" 333_300
+            share_InBPx1e2_Delegators <- MonadIOClass.liftIO  $ CLIHelpers.getIntWithDefault "Delegators share (1pb = 0.01% / 10,000pb = 100%)" 333_300
             ---------------------
             -- TODO: leer el resto de los campos que no se actualizan del datum , apra no sobreescebirlos con default
             let

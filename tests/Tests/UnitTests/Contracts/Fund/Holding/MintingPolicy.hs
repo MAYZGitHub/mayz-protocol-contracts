@@ -98,13 +98,14 @@ fundHolding_Policy_Redeemer_MintID_Tests tp =
                                 wrongDatum =
                                     FundHoldingT.mkFundHolding_DatumType
                                         10 -- hdFundHolding_Index
-                                        0 -- hdSubtotal_FT_Minted_Accumulated
-                                        0 -- hdSubtotal_FT_Minted
-                                        22 -- hdSubtotal_FT_Commissions
-                                        0 -- hdSubtotal_FT_Commissions_Release_PerMonth_1e6
-                                        0 -- hdSubtotal_FT_Commissions_Collected_Protocol
-                                        0 -- hdSubtotal_FT_Commissions_Collected_Managers
-                                        0 -- hdSubtotal_FT_Commissions_Collected_Delegators
+                                        0 -- hdSubTotal_FT_Minted_Accumulated
+                                        0 -- hdSubTotal_FT_Minted
+                                        22 -- hdSubTotal_FT_Commissions
+                                        22 -- hdSubTotal_FT_Commissions_Total
+                                        0 -- hdSubTotal_FT_Commissions_Release_PerMonth_1e6
+                                        0 -- hdSubTotal_FT_Commissions_Collected_Protocol
+                                        0 -- hdSubTotal_FT_Commissions_Collected_Managers
+                                        0 -- hdSubTotal_FT_Commissions_Collected_Delegators
                                         minAdaFundHoldingDatum
                                 wrongUTxO =
                                     (fundHolding_UTxO_With_NoDeposits_MockData tp)

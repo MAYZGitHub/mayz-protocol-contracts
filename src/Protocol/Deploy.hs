@@ -54,8 +54,8 @@ import qualified Protocol.Constants as T
 --------------------------------------------------------------------------------2
 
 -- Para obtener deploy file de fabrica de protocolo y de fondo incluido
-deploy_Protocol_And_Fund_Factory :: P.IO T.FactoryDeployParams
-deploy_Protocol_And_Fund_Factory = do
+deploy_Protocol_And_Fund_Factory2 :: P.IO T.FactoryDeployParams
+deploy_Protocol_And_Fund_Factory2 = do
     ------------------------------
     let
         version = T.mkVersionWithDependency [ProtocolT.protocolVersion, FundT.fundVersion, SwapOfferT.swapOfferVersion, BuyOrderT.buyOrderVersion, DelegationT.delegationVersion, ScriptT.scriptVersion] 0

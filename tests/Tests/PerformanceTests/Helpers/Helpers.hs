@@ -147,7 +147,7 @@ testDepositBuiltinDataCode commission_PerYear_InBPx1e3 deadline date deposit fun
 
 testDeposit :: [Integer] -> LedgerApiV2.POSIXTime -> LedgerApiV2.POSIXTime -> Integer ->  LedgerValue.AssetClass -> LedgerValue.Value -> LedgerValue.Value -> T.InvestUnit ->   Bool
 testDeposit commissions_Table_Numerator_1e6 deadline date deposit fundFT_AC valueOf_FundHoldingDatum_In valueOf_FundHoldingDatum_Out investUnit =
-    traceIfFalse "not isCorrect_Output_FundHolding_Value_With_Tokens_And_FT" (isCorrect_Output_FundHolding_Value valueFor_FundHoldingDatum_Control_With_Tokens_And_FT valueOf_FundHoldingDatum_Out)
+    traceIfFalse "wrong output values" (isCorrect_Output_FundHolding_Value valueFor_FundHoldingDatum_Control_With_Tokens_And_FT valueOf_FundHoldingDatum_Out)
     where
     ------------------
         !(_, commissionsFT, _) = FundHelpers.calculateDepositCommissionsUsingMonths commissions_Table_Numerator_1e6 deadline date deposit

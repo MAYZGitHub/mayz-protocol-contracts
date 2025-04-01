@@ -1156,6 +1156,8 @@ getUnsafeScriptHash_In_Address :: LedgerApiV2.Address -> LedgerApiV2.ValidatorHa
 getUnsafeScriptHash_In_Address (LedgerApiV2.Address (LedgerApiV2.ScriptCredential !script_Hash) _) = script_Hash
 getUnsafeScriptHash_In_Address _ = traceError "getScriptHash_In_Address"
 
+
+
 --------------------------------------------------------------------------------2
 
 {-# INLINEABLE isScriptAddress #-}

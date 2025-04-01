@@ -60,6 +60,7 @@ import qualified Protocol.PABTypes                as T
 import qualified Protocol.Protocol.Types          as ProtocolT
 import qualified Protocol.Script.Types            as ScriptT
 import qualified Protocol.SwapOffer.Types         as SwapOfferT
+import qualified Protocol.Delegation.Types        as DelegationT
 import qualified Protocol.Types                   as T
 
 --------------------------------------------------------------------------------2
@@ -118,14 +119,14 @@ getFullUTxO_With_FundHoldingDatum_By_CS fundHoldingPolicyID_CS uTxOsAt_FundHoldi
 
 --------------------------------------------------------------------------------2
 
-getFullUTxO_With_FundHoldingDatum_And_Enough_Subtotal_By_CS :: Integer -> LedgerApiV2.CurrencySymbol -> DataMap.Map LedgerApiV2.TxOutRef LedgerTx.DecoratedTxOut -> PlutusContract.Contract w s DataText.Text (LedgerApiV2.TxOutRef, LedgerTx.DecoratedTxOut, FundHoldingT.FundHoldingDatumType)
-getFullUTxO_With_FundHoldingDatum_And_Enough_Subtotal_By_CS amount fundHoldingPolicyID_CS uTxOsAt_FundHoldingValidator = do
+getFullUTxO_With_FundHoldingDatum_And_Enough_SubTotal_By_CS :: Integer -> LedgerApiV2.CurrencySymbol -> DataMap.Map LedgerApiV2.TxOutRef LedgerTx.DecoratedTxOut -> PlutusContract.Contract w s DataText.Text (LedgerApiV2.TxOutRef, LedgerTx.DecoratedTxOut, FundHoldingT.FundHoldingDatumType)
+getFullUTxO_With_FundHoldingDatum_And_Enough_SubTotal_By_CS amount fundHoldingPolicyID_CS uTxOsAt_FundHoldingValidator = do
     !utxos <- OffChainHelpers.getUnsafe_TxOutRefs_DecoratedTxOuts_And_DatumsTypes_By_CS @FundHoldingT.ValidatorDatum @FundHoldingT.FundHoldingDatumType fundHoldingPolicyID_CS uTxOsAt_FundHoldingValidator FundHoldingT.getFundHolding_DatumType
     case utxos of
         [] -> do
             PlutusContract.throwError "No uTxO_With_FundHoldingDatum found"
         _ -> do
-            let selected = [ utxo | utxo <- utxos, (\(_, _, datum') -> FundHoldingT.hdSubtotal_FT_Minted datum' >= amount) utxo]
+            let selected = [ utxo | utxo <- utxos, (\(_, _, datum') -> FundHoldingT.hdSubTotal_FT_Minted datum' >= amount) utxo]
             case selected of
                 [] -> do
                     PlutusContract.throwError "No uTxO_With_FundHoldingDatum with enough amount"
@@ -458,6 +459,42 @@ readStringDecodedAsSwapOfferPolicyRedeemer encoded = do
     !raw <- OffChainHelpers.readStringDecodedAsRedeemer encoded
     P.putStrLn $ "Raw: " ++ P.show raw
     let !result = LedgerApiV2.unsafeFromBuiltinData @SwapOfferT.PolicyRedeemer (LedgerApiV2.getRedeemer raw)
+    P.putStrLn $ "Result: " ++ P.show result
+    return result
+
+------------------------------
+
+
+-- readStringDecodedAsDelegationValidatorRedeemer "{\"getRedeemer\":\"d87981d87980\"}"
+-- readStringDecodedAsDelegationValidatorRedeemer "{\"getRedeemer\":\"d87a81d87980\"}"
+
+-- readStringDecodedAsDelegationValidatorRedeemer "{\"getRedeemer\":\"d87b81d87980\"}"
+
+readStringDecodedAsDelegationValidatorRedeemer :: P.String -> P.IO DelegationT.ValidatorRedeemer
+readStringDecodedAsDelegationValidatorRedeemer encoded = do
+    !raw <- OffChainHelpers.readStringDecodedAsRedeemer encoded
+    P.putStrLn $ "Raw: " ++ P.show raw
+    let !result = LedgerApiV2.unsafeFromBuiltinData @DelegationT.ValidatorRedeemer (LedgerApiV2.getRedeemer raw)
+    P.putStrLn $ "Result: " ++ P.show result
+    return result
+
+-- readStringDecodedAsDelegationValidatorDatum "{\"getDatum\":\"d87981d879881928a4581c01bf21f30fcb8ff64aa247dc9b7599b2b9e51ece4067b7e479e6dd1c581c71e341857b07e98f7208ce2a85ab6301b372aa58453e5e5d59aaedce581ce44c67c53e593671792cc27f095bbcc69aaee2ff1b4d875bdbff5cabd87a80d87982581ce0b33937400326885f7186e2725a84786266ec1eb06d397680233f80444d41595a1a03473bc01a005b8d80\"}"
+
+readStringDecodedAsDelegationValidatorDatum :: P.String -> P.IO DelegationT.ValidatorDatum
+readStringDecodedAsDelegationValidatorDatum encoded = do
+    !raw <- OffChainHelpers.readStringDecodedAsDatum encoded
+    P.putStrLn $ "Raw: " ++ P.show raw
+    let !result = LedgerApiV2.unsafeFromBuiltinData @DelegationT.ValidatorDatum (LedgerApiV2.getDatum raw)
+    P.putStrLn $ "Result: " ++ P.show result
+    return result
+
+
+
+readStringDecodedAsDelegationPolicyRedeemer :: P.String -> P.IO DelegationT.PolicyRedeemer
+readStringDecodedAsDelegationPolicyRedeemer encoded = do
+    !raw <- OffChainHelpers.readStringDecodedAsRedeemer encoded
+    P.putStrLn $ "Raw: " ++ P.show raw
+    let !result = LedgerApiV2.unsafeFromBuiltinData @DelegationT.PolicyRedeemer (LedgerApiV2.getRedeemer raw)
     P.putStrLn $ "Result: " ++ P.show result
     return result
 

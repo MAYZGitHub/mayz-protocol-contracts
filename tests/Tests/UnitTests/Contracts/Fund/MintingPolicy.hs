@@ -815,6 +815,42 @@ fund_Policy_Redeemer_BurnFT_Tests tp =
                     results <- testContextWrapper tp ctx'
                     (Just selectedRedeemer, results)
                         `assertResultsContainAnyOf` ["not isBurningFT"]
+                -- , Tasty.testCase "Burning FT with Fund before beginAt must fail" $ do
+                --     let
+                --         before = FundT.fdBeginAt (fund_DatumType_MockData tp) - LedgerApiV2.POSIXTime sum_ANY_INVALID_NUMBER
+                --         ctx' =  fund_Withdraw_TxContext tp before deposit_MockData (before+1) withdraw_MockData
+                --             -- ctx
+                --             --     |> setValidyRange (createValidRange before)
+                --     results <- testContextWrapper tp ctx'
+                --     (Just selectedRedeemer, results)
+                --         `assertResultsContainAnyOf` ["not isFundOpen"]
+                , Tasty.testCase "Burning FT with Fund after deadline must succeed" $ do
+                    let
+                        after = FundT.fdDeadline (fund_DatumType_MockData tp) + LedgerApiV2.POSIXTime sum_ANY_INVALID_NUMBER
+                        ctx' =  fund_Withdraw_TxContext tp (tpDepositDate tp) deposit_MockData after withdraw_MockData
+                            -- ctx
+                            --     |> setValidyRange (createValidRange after)
+                    results <- testContextWrapper tp ctx'
+                    (Nothing, results)
+                        `assertResultsContainAnyOf` []
+                , Tasty.testCase "Burning FT with Closed Fund must succeed" $ do
+                    let
+                        ctx' =
+                            ctx
+                                |> setInputsRef [fund_UTxO_MockData', investUnit_UTxO_MockData tp]
+
+                        fund_DatumType' =
+                            (fund_DatumType_MockData tp)
+                                { FundT.fdClosedAt = Just $ tpWithdrawDate tp - LedgerApiV2.POSIXTime sum_ANY_INVALID_NUMBER
+                                }
+                        fund_UTxO_MockData' =
+                            (fund_UTxO_MockData tp)
+                                { LedgerApiV2.txOutDatum =
+                                    LedgerApiV2.OutputDatum $ FundT.mkDatum fund_DatumType'
+                                }
+                    results <- testContextWrapper tp ctx'
+                    (Nothing, results)
+                        `assertResultsContainAnyOf` []
                 ]
 
 --------------------------------------------------------------------------------

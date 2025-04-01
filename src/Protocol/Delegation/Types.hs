@@ -35,6 +35,7 @@ import qualified Prelude as P
 -- Import Internos
 --------------------------------------------------------------------------------2
 
+import qualified Generic.OnChainHelpers as OnChainHelpers
 import qualified Generic.Types as T
 import qualified Protocol.Constants as T
 import qualified Protocol.Fund.Types as FundT
@@ -72,8 +73,9 @@ instance Eq PolicyParams where
 PlutusTx.makeLift ''PolicyParams
 PlutusTx.makeIsDataIndexed ''PolicyParams [('PolicyParams, 0)]
 
-newtype ValidatorParams = ValidatorParams
+data ValidatorParams = ValidatorParams
     { vpProtocolPolicyID_CS :: T.CS
+    , vpTokenEmergencyAdminPolicy_CS :: LedgerApiV2.CurrencySymbol
     }
     deriving (DataAeson.FromJSON, DataAeson.ToJSON, DataOpenApiSchema.ToSchema, GHCGenerics.Generic, P.Eq, P.Ord, P.Show, Schema.ToSchema)
 
@@ -81,6 +83,7 @@ instance Eq ValidatorParams where
     {-# INLINEABLE (==) #-}
     p1 == p2 =
         vpProtocolPolicyID_CS p1 == vpProtocolPolicyID_CS p2
+         && vpTokenEmergencyAdminPolicy_CS p1 == vpTokenEmergencyAdminPolicy_CS p2
 
 PlutusTx.makeLift ''ValidatorParams
 PlutusTx.makeIsDataIndexed ''ValidatorParams [('ValidatorParams, 0)]
@@ -128,6 +131,13 @@ PlutusTx.makeIsDataIndexed ''ValidatorDatum [('Delegation_Datum, 0)]
 {-# INLINEABLE getDelegation_DatumType #-}
 getDelegation_DatumType :: ValidatorDatum -> Delegation_DatumType
 getDelegation_DatumType (Delegation_Datum sdType) = sdType
+
+{-# INLINEABLE getDelegation_DatumType_From_UTxO #-}
+getDelegation_DatumType_From_UTxO :: LedgerApiV2.TxOut -> Delegation_DatumType
+getDelegation_DatumType_From_UTxO utxo = case OnChainHelpers.getInlineDatum_From_TxOut @ValidatorDatum utxo of
+    Nothing -> P.error "No Delegation Datum found"
+    Just datum' -> getDelegation_DatumType datum'
+
 
 instance T.ShowDatum ValidatorDatum where
     showCborAsDatumType cbor = case LedgerApiV2.fromBuiltinData @ValidatorDatum cbor of
@@ -250,11 +260,22 @@ instance Eq ValidatorRedeemerDeleteType where
 
 PlutusTx.makeIsDataIndexed ''ValidatorRedeemerDeleteType [('ValidatorRedeemerDeleteType, 0)]
 
+data ValidatorRedeemerEmergencyType = ValidatorRedeemerEmergencyType deriving (DataAeson.FromJSON, DataAeson.ToJSON, GHCGenerics.Generic, P.Show)
+
+instance Eq ValidatorRedeemerEmergencyType where
+    {-# INLINEABLE (==) #-}
+    r1 == r2 = r1 == r2
+
+PlutusTx.makeIsDataIndexed
+    ''ValidatorRedeemerEmergencyType
+    [('ValidatorRedeemerEmergencyType, 0)]
+
 data ValidatorRedeemer
     = ValidatorRedeemerUpdateMinADA ValidatorRedeemerUpdateMinADAType
     | ValidatorRedeemerDeposit ValidatorRedeemerDepositType
     | ValidatorRedeemerWithdraw ValidatorRedeemerWithdrawType
     | ValidatorRedeemerDelete ValidatorRedeemerDeleteType
+    | ValidatorRedeemerEmergency ValidatorRedeemerEmergencyType
     deriving (DataAeson.FromJSON, DataAeson.ToJSON, GHCGenerics.Generic, P.Show)
 
 instance Eq ValidatorRedeemer where
@@ -263,6 +284,7 @@ instance Eq ValidatorRedeemer where
     ValidatorRedeemerDeposit rmcp1 == ValidatorRedeemerDeposit rmcp2 = rmcp1 == rmcp2
     ValidatorRedeemerWithdraw rmcp1 == ValidatorRedeemerWithdraw rmcp2 = rmcp1 == rmcp2
     ValidatorRedeemerDelete rmcp1 == ValidatorRedeemerDelete rmcp2 = rmcp1 == rmcp2
+    ValidatorRedeemerEmergency rmcp1 == ValidatorRedeemerEmergency rmcp2 = rmcp1 == rmcp2
     _ == _ = False
 
 PlutusTx.makeIsDataIndexed
@@ -271,6 +293,7 @@ PlutusTx.makeIsDataIndexed
     , ('ValidatorRedeemerDeposit, 1)
     , ('ValidatorRedeemerWithdraw, 2)
     , ('ValidatorRedeemerDelete, 3)
+    , ('ValidatorRedeemerEmergency, 4)
     ]
 
 --------------------------------------------------------------------------------2
@@ -280,6 +303,7 @@ getValidatorRedeemerName (Just (ValidatorRedeemerUpdateMinADA ValidatorRedeemerU
 getValidatorRedeemerName (Just (ValidatorRedeemerDeposit ValidatorRedeemerDepositType {})) = Just "Deposit"
 getValidatorRedeemerName (Just (ValidatorRedeemerWithdraw ValidatorRedeemerWithdrawType {})) = Just "Withdraw"
 getValidatorRedeemerName (Just (ValidatorRedeemerDelete ValidatorRedeemerDeleteType)) = Just "Delete"
+getValidatorRedeemerName (Just (ValidatorRedeemerEmergency ValidatorRedeemerEmergencyType)) = Just "Emergency"
 getValidatorRedeemerName _ = Nothing
 
 --------------------------------------------------------------------------------2

@@ -51,13 +51,13 @@ protocolID_TN :: T.TN
 protocolID_TN = LedgerApiV2.TokenName "ProtocolID" -- es NFT, la poliza es unica
 
 protocolTokenEmergencyAdmin_TN :: T.TN
-protocolTokenEmergencyAdmin_TN = LedgerApiV2.TokenName "EmergencyAdmin"
+protocolTokenEmergencyAdmin_TN = LedgerApiV2.TokenName "EMRCY"
 
 protocolTokenAdmin_TN :: T.TN
-protocolTokenAdmin_TN = LedgerApiV2.TokenName "Admin"
+protocolTokenAdmin_TN = LedgerApiV2.TokenName "ADMIN"
 
 fundTokenAdmin_TN :: T.TN
-fundTokenAdmin_TN = LedgerApiV2.TokenName "Admin"
+fundTokenAdmin_TN = LedgerApiV2.TokenName "ADMIN"
 
 fundID_TN :: T.TN
 fundID_TN = LedgerApiV2.TokenName "FundID" -- es NFT, la poliza es unica y el validador es unico tambien

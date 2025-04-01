@@ -229,8 +229,13 @@ data FundDeployParams = FundDeployParams
 --------------------------------------------------------------------------------2
 
 data DeployAllPreParams = DeployAllPreParams
-    { dapProtocolVersion :: Integer
+    {
+        dapProtocolVersion :: Integer
     , dapFundVersion :: Integer
+    , dapSwapOfferVersion :: Integer
+    , dapBuyOrderVersion :: Integer
+    , dapDelegationVersion :: Integer
+    , dapScriptVersion :: Integer
     , dapProtocolPolicyID_Pre_CborHex :: P.String
     , dapProtocolValidator_Pre_CborHex :: P.String
     , dapScriptPolicyID_Pre_CborHex :: P.String
@@ -949,6 +954,16 @@ examplePABFundCollect_Protocol_CommissionParams =
         , pfwpcpAmount = exampleInteger
         }
 
+examplePABFundCollect_Managers_CommissionParams :: PABFundCollect_Managers_CommissionParams
+examplePABFundCollect_Managers_CommissionParams =
+    PABFundCollect_Managers_CommissionParams
+        { pfwfcpProtocolPABParams = exampleProtocolPABParams
+        , pfwfcpFundPABParams = exampleFundPABParams
+        , pfwfcpFundHoldingTxOutRef = exampleTxOutRef
+        , pfwfcpAmount = exampleInteger
+        }
+
+
 examplePABFundCollect_Delegators_CommissionParams :: PABFundCollect_Delegators_CommissionParams
 examplePABFundCollect_Delegators_CommissionParams =
     PABFundCollect_Delegators_CommissionParams
@@ -958,14 +973,6 @@ examplePABFundCollect_Delegators_CommissionParams =
         , pfwmcpAmount = exampleInteger
         }
 
-examplePABFundCollect_Managers_CommissionParams :: PABFundCollect_Managers_CommissionParams
-examplePABFundCollect_Managers_CommissionParams =
-    PABFundCollect_Managers_CommissionParams
-        { pfwfcpProtocolPABParams = exampleProtocolPABParams
-        , pfwfcpFundPABParams = exampleFundPABParams
-        , pfwfcpFundHoldingTxOutRef = exampleTxOutRef
-        , pfwfcpAmount = exampleInteger
-        }
 
 --------------------------------------------------------------------------------2
 --------------------------------------------------------------------------------2

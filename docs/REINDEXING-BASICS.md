@@ -74,7 +74,7 @@ Each fund in the MAYZ Protocol consists of:
 Key points:
 - Multiple UTXOs allow for concurrency in user operations
 - Each UTXO contains a portion of the fund's total assets
-- Calculating fund totals requires summing subtotals from all UTXOs
+- Calculating fund totals requires summing subTotals from all UTXOs
 - Operating on many UTXOs is resource-intensive and limited by transaction constraints
 
 Challenges:
@@ -116,7 +116,7 @@ Balancing is necessary after reidx to redistribute tokens across all Fund Holdin
 
 Key Points:
 - Must operate on two UTXOs at a time.
-- Modifies the hdSubtotal_FT_Commissions and hdSubtotal_FT_Commissions_Release_PerMonth_1e6 fields in the Fund Holding datum to reflect proportional changes.
+- Modifies the hdSubTotal_FT_Commissions and hdSubTotal_FT_Commissions_Release_PerMonth_1e6 fields in the Fund Holding datum to reflect proportional changes.
 - Can move tokens between UTXOs, but the first input must always have non-zero deposits to calculate the changeRatio to be used.
 - Maintains minimum ADA as specified in each datum.
 
@@ -124,12 +124,12 @@ Key Points:
 
 The Fund Holding datum contains several important fields:
 
-1. hdSubtotal_FT_Minted
-2. hdSubtotal_FT_Minted_Accumulated
-3. hdSubtotal_FT_Commissions
-4. hdSubtotal_FT_Commissions_Release_PerMonth_1e6
+1. hdSubTotal_FT_Minted
+2. hdSubTotal_FT_Minted_Accumulated
+3. hdSubTotal_FT_Commissions
+4. hdSubTotal_FT_Commissions_Release_PerMonth_1e6
 
-After balancing, fields 1 (hdSubtotal_FT_Minted) and 2 (hdSubtotal_FT_Minted_Accumulated) may become out of sync with the actual token amounts in the UTXO. Fields 3 (hdSubtotal_FT_Commissions) and 4 (hdSubtotal_FT_Commissions_Release_PerMonth_1e6) will be updated to reflect the proportional changes made during balancing, ensuring the correct synchronization of commissions and release values.
+After balancing, fields 1 (hdSubTotal_FT_Minted) and 2 (hdSubTotal_FT_Minted_Accumulated) may become out of sync with the actual token amounts in the UTXO. Fields 3 (hdSubTotal_FT_Commissions) and 4 (hdSubTotal_FT_Commissions_Release_PerMonth_1e6) will be updated to reflect the proportional changes made during balancing, ensuring the correct synchronization of commissions and release values.
 
 ## Withdrawals and Commissions
 
@@ -180,7 +180,7 @@ It's crucial to note that while individual datum values may become out of sync w
 
 2. Aggregate accuracy: The sum of these values across all fund holdings remains meaningful and accurate at the fund level.
 
-For example, to determine the total minted tokens of a fund, one must sum the 'hdSubtotal_FT_Minted' fields across all fund holdings. This sum remains accurate even if individual values may be negative due to withdrawals exceeding deposits in a particular UTXO.
+For example, to determine the total minted tokens of a fund, one must sum the 'hdSubTotal_FT_Minted' fields across all fund holdings. This sum remains accurate even if individual values may be negative due to withdrawals exceeding deposits in a particular UTXO.
 
 This approach strikes a balance between operational feasibility and maintaining essential fund-level accuracy, albeit at the cost of some UTXO-level discrepancies.
 

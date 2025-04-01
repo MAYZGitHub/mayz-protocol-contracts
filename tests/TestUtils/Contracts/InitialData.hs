@@ -15,25 +15,31 @@ module TestUtils.Contracts.InitialData where
 import qualified Ledger
 import qualified Ledger.Ada as LedgerAda
 import qualified Ledger.Crypto as LedgerCrypto
+import qualified Ledger.Value as LedgerValue
 import qualified Plutus.V2.Ledger.Api as LedgerApiV2
 import PlutusTx.Prelude
-import qualified Ledger.Value as LedgerValue
 
 -- Project imports
 import qualified Generic.OffChainHelpers as OffChainHelpers
 import qualified Generic.OnChainHelpers as OnChainHelpers
 import qualified Protocol.Constants as T
+import qualified Protocol.Delegation.Types as DelegationT
 import qualified Protocol.Fund.Helpers as FundHelpers
 import qualified Protocol.Fund.Helpers as FundT
 import qualified Protocol.Fund.Holding.Types as FundHoldingT
-import qualified Protocol.Fund.Types as FundT
 import qualified Protocol.Fund.InvestUnit.Types as InvestUnitT
+import qualified Protocol.Fund.Types as FundT
 import qualified Protocol.OffChainHelpers as OffChainHelpers
 import qualified Protocol.OnChainHelpers as OnChainHelpers
 import qualified Protocol.Protocol.Types as ProtocolT
 import qualified Protocol.SwapOffer.Types as SwapOfferT
 import qualified Protocol.Types as T
 import TestUtils.HelpersMAYZ
+    ( calculateDepositCommissionsUsingMonths_,
+      calculateDepositCommissionsUsingMonths_Parametrizable,
+      calculateWithdrawCommissionsUsingMonths_,
+      calculateWithdrawCommissionsUsingMonths_Parametrizable,
+      mkFundHoldingID_TN )
 import TestUtils.TypesMAYZ
 
 --------------------------------------------------------------------------------
@@ -57,6 +63,9 @@ minAdaFundHoldingDatum = 20_000_000
 
 minAdaSwapOfferDatum :: Integer
 minAdaSwapOfferDatum = 3_600_000
+
+minAdaDelegationDatum :: Integer
+minAdaDelegationDatum = 3_600_000
 
 minAdaScriptDatum :: Integer
 minAdaScriptDatum = 50_000_000
@@ -137,6 +146,9 @@ withdraw_MockData = 50_000_000
 withdraw_Commissions_MockData :: Integer
 withdraw_Commissions_MockData = 10
 
+delegation_MockData :: Integer
+delegation_MockData = 1_000_000
+
 --------------------------------------------------------------------------------
 
 protocol_Datum_MockData :: TestParams -> LedgerApiV2.Datum
@@ -154,7 +166,7 @@ protocol_DatumType_MockData tp =
         (tpTokenAdminPolicy_CS tp) -- pdTokenAdminPolicy_CS
         [tpFundCategory tp] -- fundCategories
         (tpFundLifeTime tp) -- pdFundLifeTime
-        (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp))  -- pdTokenMAYZ_AC
+        (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp)) -- pdTokenMAYZ_AC
         (tpRequiredMAYZForSwapOffer tp) -- pdRequiredMAYZForSwapOffers
         (tpRequiredMAYZForBuyOrder tp) -- pdRequiredMAYZForBuyOrders
         (tp_MinMaxDef_CommissionFund_PerYear_InBPx1e3 tp) -- pdCommissionFund_PerYear_InBPx1e3
@@ -211,7 +223,7 @@ fund_DatumType_MockData tp =
         0 -- fdHoldingsCount
         0 -- fdHoldingsIndex
         T.maxDepositAndWithdraw_aux -- fdMaxDepositAndWithdraw
-        (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp))  -- fdTokenMAYZ_AC
+        (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp)) -- fdTokenMAYZ_AC
         (ProtocolT.fcRequiredMAYZ $ tpFundCategory tp) -- fdRequiredMAYZ
         minAdaFundDatum -- fdMinADA
 
@@ -244,7 +256,7 @@ fund_DatumType_MockData_Parametrizable tp beginDate deadlineDate closedAt commis
             0 -- fdHoldingsCount
             0 -- fdHoldingsIndex
             T.maxDepositAndWithdraw_aux -- fdMaxDepositAndWithdraw
-            (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp))  -- fdTokenMAYZ_AC
+            (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp)) -- fdTokenMAYZ_AC
             (ProtocolT.fcRequiredMAYZ $ tpFundCategory tp) -- fdRequiredMAYZ
             minAdaFundDatum -- fdMinADA
 
@@ -268,7 +280,7 @@ fund_DatumType_MockData_Parametrizable2 tp num_FundHolding_UTxOs =
         num_FundHolding_UTxOs -- fdHoldingsCount
         0 -- fdHoldingsIndex
         T.maxDepositAndWithdraw_aux -- fdMaxDepositAndWithdraw
-        (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp))  -- fdTokenMAYZ_AC
+        (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp)) -- fdTokenMAYZ_AC
         (ProtocolT.fcRequiredMAYZ $ tpFundCategory tp) -- fdRequiredMAYZ
         minAdaFundDatum -- fdMinADA
 
@@ -366,13 +378,14 @@ fundHolding_DatumType_With_NoDeposits_MockData :: TestParams -> FundHoldingT.Fun
 fundHolding_DatumType_With_NoDeposits_MockData _ =
     FundHoldingT.mkFundHolding_DatumType
         0 -- hdFundHolding_Index
-        0 -- hdSubtotal_FT_Minted_Accumulated
-        0 -- hdSubtotal_FT_Minted
-        0 -- hdSubtotal_FT_Commissions
-        0 -- hdSubtotal_FT_Commissions_Release_PerMonth_1e6
-        0 -- hdSubtotal_FT_Commissions_Collected_Protocol
-        0 -- hdSubtotal_FT_Commissions_Collected_Managers
-        0 -- hdSubtotal_FT_Commissions_Collected_Delegators
+        0 -- hdSubTotal_FT_Minted_Accumulated
+        0 -- hdSubTotal_FT_Minted
+        0 -- hdSubTotal_FT_Commissions
+        0 -- hdSubTotal_FT_Commissions_Total
+        0 -- hdSubTotal_FT_Commissions_Release_PerMonth_1e6
+        0 -- hdSubTotal_FT_Commissions_Collected_Protocol
+        0 -- hdSubTotal_FT_Commissions_Collected_Managers
+        0 -- hdSubTotal_FT_Commissions_Collected_Delegators
         minAdaFundHoldingDatum -- hdMinADA
 
 fundHolding_Datum_With_NoDeposits_MockData :: TestParams -> LedgerApiV2.Datum
@@ -654,7 +667,7 @@ investUnit_UTxO_After_ReIdx_MockData tp =
 fundHolding_UTxO_After_Reidx_MockData :: TestParams -> T.InvestUnit -> T.InvestUnit -> LedgerApiV2.TxOut
 fundHolding_UTxO_After_Reidx_MockData tp investUnit_Initial' investUnit_AfterReIdx' =
     let
-        !total_Deposits_IU = FundHoldingT.hdSubtotal_FT_Minted (fundHolding_DatumType_With_Deposits_MockData tp)
+        !total_Deposits_IU = FundHoldingT.hdSubTotal_FT_Minted (fundHolding_DatumType_With_Deposits_MockData tp)
         !valueOf_TotalTokensToAdd = OnChainHelpers.flattenValueToValue [(cs, tn, (am * total_Deposits_IU) `divide` 100) | (cs, tn, am) <- T.iuValues investUnit_AfterReIdx']
         !valueOf_TotalTokensToRemove = OnChainHelpers.flattenValueToValue [(cs, tn, (am * total_Deposits_IU) `divide` 100) | (cs, tn, am) <- T.iuValues investUnit_Initial']
         !valueOf_FundHoldingDatum_In = LedgerApiV2.txOutValue (fundHolding_UTxO_With_Deposits_MockData tp)
@@ -681,7 +694,7 @@ swapOffer_DatumType_MockData tp =
         T.swapOffer_AllowSell
         T.swapOffer_AllowSell
         T.swapOffer_Status_Open -- order_Status
-         (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp))  -- tokenMAYZ_AC
+        (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp)) -- tokenMAYZ_AC
         (ProtocolT.pdRequiredMAYZForSwapOffer $ protocol_DatumType_MockData tp)
         minAdaSwapOfferDatum -- minADA
 
@@ -726,7 +739,7 @@ swapOffer_DatumType_MockData_Parametrizable tp amount_FT_Available amount_ADA_Av
         T.swapOffer_AllowSell
         T.swapOffer_AllowSell
         T.swapOffer_Status_Open -- order_Status
-         (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp))  -- tokenMAYZ_AC
+        (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp)) -- tokenMAYZ_AC
         (ProtocolT.pdRequiredMAYZForSwapOffer $ protocol_DatumType_MockData tp)
         minAdaSwapOfferDatum -- minADA
 
@@ -754,6 +767,47 @@ swapOffer_UTxO_MockData_Parametrizable tp amount_FT_Available amount_ADA_Availab
                     (SwapOfferT.sodAmount_ADA_Available $ swapOffer_DatumType_MockData_Parametrizable tp amount_FT_Available amount_ADA_Available)
             )
             (LedgerApiV2.OutputDatum $ swapOffer_Datum_MockData_Parametrizable tp amount_FT_Available amount_ADA_Available)
+            Nothing
+
+--------------------------------------------------------------------------------
+
+delegation_DatumType_MockData :: TestParams -> DelegationT.Delegation_DatumType
+delegation_DatumType_MockData tp =
+    DelegationT.mkDelegation_DatumType
+        (tpDelegationPolicyID_CS tp) -- delegationPolicyID_CS
+        (tpFundPolicy_CS tp) -- fundPolicy_CS
+        (tpDelegationAdmin tp) -- sellerPaymentPKH
+        Nothing -- sellerStakePKH
+        (LedgerValue.AssetClass (tpTokenMAYZ_CS tp, tpTokenMAYZ_TN tp)) -- tokenMAYZ_AC
+        delegation_MockData -- delegated_MAYZ
+        minAdaDelegationDatum -- minADA
+
+
+-- delegationPolicyID_CS
+--     fundPolicy_CS
+--     delegatorPaymentPKH
+--     delegatorStakePKH
+--     tokenMAYZ_AC
+--     delegated_MAYZ
+
+
+delegation_Datum_MockData :: TestParams -> LedgerApiV2.Datum
+delegation_Datum_MockData tp = DelegationT.mkDatum $ delegation_DatumType_MockData tp
+
+delegation_UTxO_MockData :: TestParams -> LedgerApiV2.TxOut
+delegation_UTxO_MockData tp =
+    let
+        !valueOf_MAYZ = LedgerApiV2.singleton (tpTokenMAYZ_CS tp) (tpTokenMAYZ_TN tp) delegation_MockData
+    in
+        ---------------------
+        LedgerApiV2.TxOut
+            (OffChainHelpers.addressValidator $ tpDelegationValidator_Hash tp)
+            ( LedgerAda.lovelaceValueOf minAdaDelegationDatum
+                <> LedgerApiV2.singleton (tpDelegationPolicyID_CS tp) T.delegationID_TN 1
+                <> valueOf_MAYZ
+                
+            )
+            (LedgerApiV2.OutputDatum $ delegation_Datum_MockData tp)
             Nothing
 
 --------------------------------------------------------------------------------

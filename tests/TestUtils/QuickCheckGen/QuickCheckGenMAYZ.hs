@@ -315,12 +315,12 @@ genValidFundHoldingDatumType tp = do
         fundHoldingDatumType = fundHolding_DatumType_With_NoDeposits_MockData tp
     return fundHoldingDatumType
     -- fundHolding_Index <- abs <$> QC.arbitrary
-    -- subtotal_FT_Minted_Accumulated <- abs <$> QC.arbitrary
-    -- subtotal_FT_Minted <- abs <$> QC.arbitrary
-    -- subtotal_FT_Commissions <- abs <$> QC.arbitrary
+    -- subTotal_FT_Minted_Accumulated <- abs <$> QC.arbitrary
+    -- subTotal_FT_Minted <- abs <$> QC.arbitrary
+    -- subTotal_FT_Commissions <- abs <$> QC.arbitrary
     -- -- We multiply by 100 to get bigger values.
-    -- subtotal_FT_Commissions_Acumulated <- abs . (* 100) <$> QC.arbitrary
-    -- subtotal_FT_Commissions_Release_PerMonth_1e6 <- abs <$> QC.arbitrary
+    -- subTotal_FT_Commissions_Acumulated <- abs . (* 100) <$> QC.arbitrary
+    -- subTotal_FT_Commissions_Release_PerMonth_1e6 <- abs <$> QC.arbitrary
     -- -- We force the next three values for always giving a positive amount
     -- -- of available commissions at the given date and fund deadline.
     -- let
@@ -329,35 +329,35 @@ genValidFundHoldingDatumType tp = do
     --     date = tpCollectCommissionsDate tp
     --     deadline = FundT.fdDeadline fund_DatumType_
     --     monthsRemainingRational = FundHelpers.getRemainingMonths deadline date
-    --     rate = TxRatio.unsafeRatio subtotal_FT_Commissions_Release_PerMonth_1e6 1_000_000
+    --     rate = TxRatio.unsafeRatio subTotal_FT_Commissions_Release_PerMonth_1e6 1_000_000
     --     commisionsReady =
-    --         TxRatio.fromInteger subtotal_FT_Commissions_Acumulated
+    --         TxRatio.fromInteger subTotal_FT_Commissions_Acumulated
     --             PlutusTx.- (TxRatio.fromInteger monthsRemainingRational * rate)
-    -- subtotal_FT_Commissions_Collected_Protocol <- do
+    -- subTotal_FT_Commissions_Collected_Protocol <- do
     --     let share = ProtocolT.pdShare_InBPx1e2_Protocol protocolDatumType_
     --         sharePct = TxRatio.unsafeRatio share 10_000
     --         commisionsReady_share = commisionsReady * sharePct
     --     QC.chooseInteger (0, TxRatio.truncate commisionsReady_share)
-     -- subtotal_FT_Commissions_Collected_Managers <- do
+     -- subTotal_FT_Commissions_Collected_Managers <- do
     --     let share = ProtocolT.pdShare_InBPx1e2_Managers protocolDatumType_
     --         sharePct = TxRatio.unsafeRatio share 10_000
     --         commisionsReady_share = commisionsReady * sharePct
     --     QC.chooseInteger (0, TxRatio.truncate commisionsReady_share)
-    -- subtotal_FT_Commissions_Collected_Delegators <- do
+    -- subTotal_FT_Commissions_Collected_Delegators <- do
     --     let share = ProtocolT.pdShare_InBPx1e2_Delegators protocolDatumType_
     --         sharePct = TxRatio.unsafeRatio share 10_000
     --         commisionsReady_share = commisionsReady * sharePct
     --     QC.chooseInteger (0, TxRatio.truncate commisionsReady_share)
     -- FundHoldingT.FundHoldingDatumType
     --     fundHolding_Index
-    --     subtotal_FT_Minted_Accumulated
-    --     subtotal_FT_Minted
-    --     subtotal_FT_Commissions
-    --     subtotal_FT_Commissions_Acumulated
-    --     subtotal_FT_Commissions_Release_PerMonth_1e6
-    --     subtotal_FT_Commissions_Collected_Protocol
-    --     subtotal_FT_Commissions_Collected_Managers
-    --     subtotal_FT_Commissions_Collected_Delegators
+    --     subTotal_FT_Minted_Accumulated
+    --     subTotal_FT_Minted
+    --     subTotal_FT_Commissions
+    --     subTotal_FT_Commissions_Acumulated
+    --     subTotal_FT_Commissions_Release_PerMonth_1e6
+    --     subTotal_FT_Commissions_Collected_Protocol
+    --     subTotal_FT_Commissions_Collected_Managers
+    --     subTotal_FT_Commissions_Collected_Delegators
     --     <$> (abs <$> QC.arbitrary)
 
 ------------------------------------------------------------------------------------
@@ -412,19 +412,19 @@ genValid_Collect_Protocol_Commissions_Params tp = do
         taken <- QC.chooseInteger (0, availableWithoutTaken - 1)
         let available = availableWithoutTaken - taken
         withdrawAmount <- QC.chooseInteger (1, available)
-        return $ Valid_Collect_Protocol_Commissions_Params (fundHoldingDatumType { FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol = taken }) withdrawAmount
+        return $ Valid_Collect_Protocol_Commissions_Params (fundHoldingDatumType { FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol = taken }) withdrawAmount
     else
-        return $ Valid_Collect_Protocol_Commissions_Params (fundHoldingDatumType { FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol = 0 }) 0
+        return $ Valid_Collect_Protocol_Commissions_Params (fundHoldingDatumType { FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol = 0 }) 0
 
     -- if availableWithoutTaken > 0
     -- then do
     --     taken <- QC.chooseInteger (0, availableWithoutTaken - 1)
     --     let available = availableWithoutTaken - taken
     --     withdrawAmount <- QC.chooseInteger (1, available)
-    --     return $ Valid_Collect_Protocol_Commissions_Params (fundHoldingDatumType { FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol = taken }) withdrawAmount
+    --     return $ Valid_Collect_Protocol_Commissions_Params (fundHoldingDatumType { FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol = taken }) withdrawAmount
     -- else
     --     return Nothing
-    --     -- return $ Valid_Collect_Protocol_Commissions_Params (fundHoldingDatumType { FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol = 0 }) 0
+    --     -- return $ Valid_Collect_Protocol_Commissions_Params (fundHoldingDatumType { FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol = 0 }) 0
 
 
 ------------------------------------------------------------------------------------
@@ -460,8 +460,8 @@ genValid_Collect_Managers_Params tp = do
                 DebugTrace.trace ("Testing taken: " ++ show taken) $
                     DebugTrace.trace ("Testing available: " ++ show available) $
                         DebugTrace.trace ("Testing withdrawAmount: " ++ show withdrawAmount) $
-                                return $ Valid_Collect_Managers_Params  (fundHoldingDatumType { FundHoldingT.hdSubtotal_FT_Commissions_Collected_Managers = taken}) withdrawAmount
-            else return $ Valid_Collect_Managers_Params  (fundHoldingDatumType { FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol = 0}) 0
+                                return $ Valid_Collect_Managers_Params  (fundHoldingDatumType { FundHoldingT.hdSubTotal_FT_Commissions_Collected_Managers = taken}) withdrawAmount
+            else return $ Valid_Collect_Managers_Params  (fundHoldingDatumType { FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol = 0}) 0
 
 ------------------------------------------------------------------------------------
 
@@ -492,9 +492,9 @@ genValid_Collect_Delegators_Params tp = do
         taken <- QC.chooseInteger (0, availableWithoutTaken - 1)
         let available = availableWithoutTaken - taken
         withdrawAmount <- QC.chooseInteger (1, available)
-        return $ Collect_Delegators_Params (fundHoldingDatumType { FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators = taken }) withdrawAmount
+        return $ Collect_Delegators_Params (fundHoldingDatumType { FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators = taken }) withdrawAmount
     else
-        return $ Collect_Delegators_Params (fundHoldingDatumType { FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators = 0 }) 0
+        return $ Collect_Delegators_Params (fundHoldingDatumType { FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators = 0 }) 0
 
 genInvalid_Collect_Delegators_ParamsZeroOrLess :: TestParams -> QC.Gen Collect_Delegators_Params
 genInvalid_Collect_Delegators_ParamsZeroOrLess tp = do
@@ -520,7 +520,7 @@ genInvalid_Collect_Delegators_ParamsMoreThanAvailables tp = do
     taken <- QC.chooseInteger (0, availableWithoutTaken - 1)
     let available = availableWithoutTaken - taken
     withdrawAmount <- QC.chooseInteger (available+1 , available+100)
-    return $ Collect_Delegators_Params (fundHoldingDatumType { FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators = taken }) withdrawAmount
+    return $ Collect_Delegators_Params (fundHoldingDatumType { FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators = taken }) withdrawAmount
 
 --------------------------------------------------------------------------------
 
@@ -564,7 +564,7 @@ genReIndexParams swTrace tp validAmountRespectDivisibility = do
     input_FundHolding_UTxOs <- mapM (\ix -> genValidFundHolding_UTxO_Parametrizable tp input_Fund_Datum base_FundHolding_Datum input_InvestUnit ix (tpDepositDate tp) True) [0 .. num_FundHolding_UTxOs - 1]
     let input_FundHolding_Datums = FundHoldingT.getFundHolding_DatumType_From_UTxO <$> input_FundHolding_UTxOs
     ------------------
-    let totalFTMinted = sum $ map FundHoldingT.hdSubtotal_FT_Minted input_FundHolding_Datums
+    let totalFTMinted = sum $ map FundHoldingT.hdSubTotal_FT_Minted input_FundHolding_Datums
     !_ <- debugTraceIfM swTrace ("-- \nTotal FT Minted: " ++ show totalFTMinted)
     ------------------
     tokenPrices <- genTokenPrices (T.iuValues input_InvestUnit)

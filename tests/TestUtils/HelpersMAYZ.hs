@@ -54,6 +54,9 @@ getTestParams filePath = do
     !params <- case maybeDeployParams of
             Just params -> generateTestParams params
             Nothing     -> P.error "Failed to load deploy parameters"
+    ------------------------------
+    P.putStrLn $ "Using Test Params: " <> show params
+    ------------------------------
     return params
 
 --------------------------------------------------------------------------------
@@ -90,8 +93,8 @@ generateTestParams deployAllParams = do
         ------------
         protocolPolicyID_TxOutRef =
             LedgerApiV2.TxOutRef
-                { LedgerApiV2.txOutRefId = "0000000000000000000000000000000000000000000000000000000000000007"
-                , LedgerApiV2.txOutRefIdx = 1
+                { LedgerApiV2.txOutRefId = "0000000000000000000000000000000000000000000000000000000000000000"
+                , LedgerApiV2.txOutRefIdx = 0
                 }
         fundPolicy_TxOutRef =
             LedgerApiV2.TxOutRef
@@ -103,8 +106,9 @@ generateTestParams deployAllParams = do
         fundAdmins = ["0000000000000000000000000000000000000000000000000000000000000005"]
         delegatorsAdmins = ["0000000000000000000000000000000000000000000000000000000000000006"]
         swapOfferAdmin = "0000000000000000000000000000000000000000000000000000000000000007"
+        delegationAdmin = "0000000000000000000000000000000000000000000000000000000000000011"
         ------------
-        tokenEmergencyAdminPolicy_CS = "0000000000000000000000000000000000000000000000000000000000000003"
+        tokenEmergencyAdminPolicy_CS = "a0c49fcf369da4a230072fe7477cd3ad0716e9d62bf7d7e3aa0ae062"
         tokenAdminPolicy_CS = "0000000000000000000000000000000000000000000000000000000000000002"
         tokenMAYZ_CS = T.tokenMAYZ_CS_aux
         tokenMAYZ_TN = T.tokenMAYZ_TN_aux
@@ -284,7 +288,8 @@ generateTestParams deployAllParams = do
                     code = tccsDelegationValidator_Pre testCompiledCodeScripts
                     -- params = exampleDelegationValiParams
                     param1 = TxBuiltins.mkB $ LedgerApiV2.unCurrencySymbol protocolPolicyID_CS
-                    appliedCode = code `PlutusTx.applyCode` PlutusTx.liftCode param1 
+                    param2 = TxBuiltins.mkB $ LedgerApiV2.unCurrencySymbol tokenEmergencyAdminPolicy_CS
+                    appliedCode = code `PlutusTx.applyCode` PlutusTx.liftCode param1 `PlutusTx.applyCode` PlutusTx.liftCode param2
                 LedgerApiV2.mkValidatorScript appliedCode
     let
         delegationValidator_Hash = OffChainHelpers.hashValidator delegationValidator
@@ -421,6 +426,7 @@ generateTestParams deployAllParams = do
             , tpFundAdmins = fundAdmins
             , tpDelegatorsAdmins = delegatorsAdmins
             , tpSwapOfferAdmin = swapOfferAdmin
+            , tpDelegationAdmin = delegationAdmin
             , tpOraclePrivateKey = oraclePrivateKey
             , tpOraclePaymentPubKey = oraclePPK
             , tpFundCategory = exampleFundCategory

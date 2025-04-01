@@ -911,20 +911,21 @@ data FundHoldingDatumType = FundHoldingDatumType {
     hdVersion :: Integer,                       -- Contract version
     
     -- Identification
-    hdFundHolding_Index :: Integer,            -- Unique holding identifier
+    hdFundHolding_Index :: Integer,             -- Unique holding identifier
     
     -- Fund Token Accounting
-    hdSubtotal_FT_Minted_Accumulated :: Integer,  -- Total FTs ever minted
-    hdSubtotal_FT_Minted :: Integer,             -- Current FTs in circulation
+    hdSubTotal_FT_Minted_Accumulated :: Integer,  -- Total FTs ever minted
+    hdSubTotal_FT_Minted :: Integer,              -- Current FTs in circulation
     
     -- Commission Tracking
-    hdSubtotal_FT_Commissions :: Integer,        -- Available commissions
-    hdSubtotal_FT_Commissions_Release_PerMonth_1e6 :: Integer,  -- Monthly release
+    hdSubTotal_FT_Commissions :: Integer,        -- Available commissions
+    hdSubTotal_FT_Commissions_Total :: Integer   -- Total commissions, for calcs, is available plus collected
+    hdSubTotal_FT_Commissions_Release_PerMonth_1e6 :: Integer,  -- Monthly release
     
     -- Commission Collections
-    hdSubtotal_FT_Commissions_Collected_Protocol :: Integer,    -- Protocol total
-    hdSubtotal_FT_Commissions_Collected_Managers :: Integer,    -- Managers total
-    hdSubtotal_FT_Commissions_Collected_Delegators :: Integer,  -- Delegators total
+    hdSubTotal_FT_Commissions_Collected_Protocol :: Integer,    -- Protocol total
+    hdSubTotal_FT_Commissions_Collected_Managers :: Integer,    -- Managers total
+    hdSubTotal_FT_Commissions_Collected_Delegators :: Integer,  -- Delegators total
     
     --- Minimum ADA
     hdMinADA :: Integer                         -- Minimum ADA used in UTXO

@@ -20,6 +20,8 @@ import qualified System.Directory as SystemDirectory (doesDirectoryExist, remove
 import qualified System.IO as SystemIO (hFlush, stdout)
 
 -- Project imports
+import           Contracts.Delegation.MintingPolicy
+import           Contracts.Delegation.Validator
 import           Contracts.Fund.Holding.MintingPolicy
 import           Contracts.Fund.Holding.Validator
 import           Contracts.Fund.MintingPolicy
@@ -40,7 +42,6 @@ import           TestUtils.HelpersMAYZ
 main :: IO ()
 main = do
     putStrLn "---------------"
-
     -- Prompt user to delete previous test contracts
     putStr "Do you want to delete previous exported test smart contracts? (yes/no): "
     SystemIO.hFlush SystemIO.stdout  -- Ensure the prompt is displayed before user input
@@ -79,6 +80,10 @@ main = do
                     , Tasty.testGroup "SwapOffer Tests"
                         [ swapOffer_Policy_Tests tp
                         , swapOffer_Validator_Tests tp
+                        ]
+                    , Tasty.testGroup "Delegation Tests"
+                        [ delegation_Policy_Tests tp
+                        , delegation_Validator_Tests tp
                         ]
                     ]
                 , Tasty.testGroup "Helpers Tests"

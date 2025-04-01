@@ -517,13 +517,14 @@ endPointFundHoldingAdd T.PABFundHoldingAddParams {..} = PlutusContract.handleErr
                 FundHoldingT.FundHoldingDatumType
                     { FundHoldingT.hdVersion = FundHoldingT.ownVersion
                     , FundHoldingT.hdFundHolding_Index = FundT.fdHoldingsIndex fundDatum_In
-                    , FundHoldingT.hdSubtotal_FT_Minted_Accumulated = 0
-                    , FundHoldingT.hdSubtotal_FT_Minted = 0
-                    , FundHoldingT.hdSubtotal_FT_Commissions = 0
-                    , FundHoldingT.hdSubtotal_FT_Commissions_Release_PerMonth_1e6 = 0
-                    , FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol = 0
-                    , FundHoldingT.hdSubtotal_FT_Commissions_Collected_Managers = 0
-                    , FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators = 0
+                    , FundHoldingT.hdSubTotal_FT_Minted_Accumulated = 0
+                    , FundHoldingT.hdSubTotal_FT_Minted = 0
+                    , FundHoldingT.hdSubTotal_FT_Commissions = 0
+                    , FundHoldingT.hdSubTotal_FT_Commissions_Total = 0
+                    , FundHoldingT.hdSubTotal_FT_Commissions_Release_PerMonth_1e6 = 0
+                    , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol = 0
+                    , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Managers = 0
+                    , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators = 0
                     , FundHoldingT.hdMinADA = minADA_For_FundHoldingDatum_Out
                     }
     ---------------------
@@ -904,7 +905,7 @@ endPointFundWithdraw T.PABFundWithdrawParams {..} = PlutusContract.handleError O
         !value_MinADA_For_User_Out = LedgerAda.lovelaceValueOf minADA_For_User_Out
         !valueFor_User_Out = valueFor_User_Out' <> value_MinADA_For_User_Out
     ---------------------
-    !uTxO_With_FundHoldingDatum <- OffChainHelpers.getFullUTxO_With_FundHoldingDatum_And_Enough_Subtotal_By_CS withdrawPlusCommissionsGetBack fundHoldingPolicyID_CS uTxOsAt_FundHoldingValidator
+    !uTxO_With_FundHoldingDatum <- OffChainHelpers.getFullUTxO_With_FundHoldingDatum_And_Enough_SubTotal_By_CS withdrawPlusCommissionsGetBack fundHoldingPolicyID_CS uTxOsAt_FundHoldingValidator
     ---------------------
     let
         !valueOf_FundHoldingDatum_In = OffChainHelpers.getValueFromDecoratedTxOut $ (\(_, dec, _) -> dec) uTxO_With_FundHoldingDatum
@@ -1128,9 +1129,9 @@ endPointFundReIndexing T.PABFundReIndexingParams {..} = PlutusContract.handleErr
                 TextPrintf.printf "Prices dont match"
     ---------------------
     let
-        getSubtotalUI :: (LedgerApiV2.TxOutRef, Ledger.DecoratedTxOut, FundHoldingT.FundHoldingDatumType) -> P.Integer
-        getSubtotalUI (_, _, !dat) = FundHoldingT.hdSubtotal_FT_Minted dat
-        !total_Deposits_IU = P.sum (getSubtotalUI <$> uTxOs_With_FundHoldingDatums)
+        getSubTotalUI :: (LedgerApiV2.TxOutRef, Ledger.DecoratedTxOut, FundHoldingT.FundHoldingDatumType) -> P.Integer
+        getSubTotalUI (_, _, !dat) = FundHoldingT.hdSubTotal_FT_Minted dat
+        !total_Deposits_IU = P.sum (getSubTotalUI <$> uTxOs_With_FundHoldingDatums)
     PlutusContract.logInfo @P.String $ TextPrintf.printf "total_Deposits_IU: %s" (P.show total_Deposits_IU)
     PlutusContract.logInfo @P.String $ TextPrintf.printf "-------------------"
     ---------------------
@@ -1299,19 +1300,19 @@ endPointFundCollect_Protocol_Commission T.PABFundCollect_Protocol_CommissionPara
         ------------------
         !shareBPx1e2 = ProtocolT.pdShare_InBPx1e2_Protocol protocolDatum_In
         !sharePct = TxRatio.unsafeRatio shareBPx1e2 10_000
-        !taken = FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol fundHoldingDatum_In
+        !taken = FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol fundHoldingDatum_In
         !available = FundHelpers.getCommissionsAvailable deadline fundHoldingDatum_In shareBPx1e2 taken now
     ------------------
     -- !msPerDay = 1000 * 60 * 60 * 24
     -- !msPerMonth = msPerDay * 30
     -- !msRemaining =  LedgerApiV2.getPOSIXTime  $ FundT.fdDeadline fundDatum_In - now
     -- !monthsRemainingRational = TxRatio.unsafeRatio msRemaining msPerMonth
-    -- -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubtotal_Commissions_RateNumerator fundHoldingDatum_In) (FundHoldingT.hdSubtotal_Commissions_RateDenominator fundHoldingDatum_In)
-    -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubtotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In) 1_000_000
+    -- -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubTotal_Commissions_RateNumerator fundHoldingDatum_In) (FundHoldingT.hdSubTotal_Commissions_RateDenominator fundHoldingDatum_In)
+    -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubTotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In) 1_000_000
     -- !commisionsReady = TxRatio.fromInteger totalCommisionsAcum - (monthsRemainingRational * rate)
     -- !sharePct = TxRatio.unsafeRatio (ProtocolT.pdShare_InBPx1e2_Protocol protocolDatum_In) 10_000
     -- !commisionsReady_For_Protocol = commisionsReady * sharePct
-    -- !alreadyWithdraw_Protocol = FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol fundHoldingDatum_In
+    -- !alreadyWithdraw_Protocol = FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol fundHoldingDatum_In
     -- !available = commisionsReady_For_Protocol - TxRatio.fromInteger alreadyWithdraw_Protocol
     ---------------------
     PlutusContract.logInfo @P.String $ TextPrintf.printf "withdrawing: %s" (P.show withdraw)
@@ -1475,19 +1476,19 @@ endPointFundCollect_Delegators_Commission T.PABFundCollect_Delegators_Commission
         ------------------
         !shareBPx1e2 = ProtocolT.pdShare_InBPx1e2_Delegators protocolDatum_In
         !sharePct = TxRatio.unsafeRatio shareBPx1e2 10_000
-        !taken = FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators fundHoldingDatum_In
+        !taken = FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators fundHoldingDatum_In
         !available = FundHelpers.getCommissionsAvailable deadline fundHoldingDatum_In shareBPx1e2 taken now
     ------------------
     -- !msPerDay = 1000 * 60 * 60 * 24
     -- !msPerMonth = msPerDay * 30
     -- !msRemaining =  LedgerApiV2.getPOSIXTime  $ FundT.fdDeadline fundDatum_In - now
     -- !monthsRemainingRational =TxRatio.unsafeRatio msRemaining msPerMonth
-    -- -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubtotal_Commissions_RateNumerator fundHoldingDatum_In) (FundHoldingT.hdSubtotal_Commissions_RateDenominator fundHoldingDatum_In)
-    -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubtotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In) 1_000_000
+    -- -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubTotal_Commissions_RateNumerator fundHoldingDatum_In) (FundHoldingT.hdSubTotal_Commissions_RateDenominator fundHoldingDatum_In)
+    -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubTotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In) 1_000_000
     -- !commisionsReady = TxRatio.fromInteger totalCommisionsAcum - (monthsRemainingRational * rate)
     -- !sharePct = TxRatio.unsafeRatio (ProtocolT.pdShare_InBPx1e2_Delegators protocolDatum_In) 10_000
     -- !commisionsReady_For_MAYZ = commisionsReady * sharePct
-    -- !alreadyWithdraw_MAYZ  = FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators fundHoldingDatum_In
+    -- !alreadyWithdraw_MAYZ  = FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators fundHoldingDatum_In
     -- !available = commisionsReady_For_MAYZ - TxRatio.fromInteger alreadyWithdraw_MAYZ
     ---------------------
     PlutusContract.logInfo @P.String $ TextPrintf.printf "withdrawing: %s" (P.show withdraw)
@@ -1651,19 +1652,19 @@ endPointFundCollect_Managers_Commission T.PABFundCollect_Managers_CommissionPara
         ------------------
         !shareBPx1e2 = ProtocolT.pdShare_InBPx1e2_Managers protocolDatum_In
         !sharePct = TxRatio.unsafeRatio shareBPx1e2 10_000
-        !taken = FundHoldingT.hdSubtotal_FT_Commissions_Collected_Managers fundHoldingDatum_In
+        !taken = FundHoldingT.hdSubTotal_FT_Commissions_Collected_Managers fundHoldingDatum_In
         !available = FundHelpers.getCommissionsAvailable deadline fundHoldingDatum_In shareBPx1e2 taken now
     ------------------
     -- !msPerDay = 1000 * 60 * 60 * 24
     -- !msPerMonth = msPerDay * 30
     -- !msRemaining =  LedgerApiV2.getPOSIXTime  $ FundT.fdDeadline fundDatum_In - now
     -- !monthsRemainingRational =TxRatio.unsafeRatio   msRemaining  msPerMonth
-    -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubtotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In) 1_000_000
-    -- -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubtotal_Commissions_RateNumerator fundHoldingDatum_In) (FundHoldingT.hdSubtotal_Commissions_RateDenominator fundHoldingDatum_In)
+    -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubTotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In) 1_000_000
+    -- -- !rate = TxRatio.unsafeRatio (FundHoldingT.hdSubTotal_Commissions_RateNumerator fundHoldingDatum_In) (FundHoldingT.hdSubTotal_Commissions_RateDenominator fundHoldingDatum_In)
     -- !commisionsReady = TxRatio.fromInteger totalCommisionsAcum - (monthsRemainingRational * rate)
     -- !sharePct = TxRatio.unsafeRatio (ProtocolT.pdShare_InBPx1e2_Managers protocolDatum_In) 10_000
     -- !commisionsReady_For_Admins = commisionsReady * sharePct
-    -- !alreadyWithdraw_Admins = FundHoldingT.hdSubtotal_FT_Commissions_Collected_Managers fundHoldingDatum_In
+    -- !alreadyWithdraw_Admins = FundHoldingT.hdSubTotal_FT_Commissions_Collected_Managers fundHoldingDatum_In
     -- !available = commisionsReady_For_Admins - TxRatio.fromInteger alreadyWithdraw_Admins
     ---------------------
     PlutusContract.logInfo @P.String $ TextPrintf.printf "withdrawing: %s" (P.show withdraw)

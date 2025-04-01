@@ -6,7 +6,7 @@ cabal test AutomaticTests
 
 cabal test UnitTests -j1 --test-options="--list-tests"
 
-cabal test UnitTests -j1 --test-options="-p \"Commissions Table\""
+cabal test UnitTests -j1 --test-options="-p \"FundHolding_BalanceAssets_Tx\""
 
 
 cabal test PropertyBasedTests -j1  --test-options="-p \"zero or negative must fail\" --quickcheck-replay=895760"
@@ -14,4 +14,7 @@ cabal test PropertyBasedTests -j1  --test-options="-p \"zero or negative must fa
 
 cabal test AutomaticTests -j1  --test-options="-p \"0 must fail\" "
 
+cabal test AutomaticTests -j1  --test-options="-p \"SwapOffer_Emergency\" "
+
 cabal run deploy
+

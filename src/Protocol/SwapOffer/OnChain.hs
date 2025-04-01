@@ -86,6 +86,12 @@ mkPolicyID (T.PolicyParams !protocolPolicyID_CS !swapOffer_Validator_Hash) !redR
                             [ LedgerApiV2.txInInfoResolved txInfoInput | !txInfoInput <- LedgerApiV2.txInfoReferenceInputs info, OnChainHelpers.isScriptAddress (LedgerApiV2.txOutAddress $ LedgerApiV2.txInInfoResolved txInfoInput)
                             ]
                         ------------------
+                        -- !inputs_Own_TxOuts =
+                        --     [ LedgerApiV2.txInInfoResolved txInfoInput | !txInfoInput <- LedgerApiV2.txInfoInputs info, let
+                        --                                                                                                     address = LedgerApiV2.txOutAddress (LedgerApiV2.txInInfoResolved txInfoInput)
+                        --                                                                                                 in
+                        --                                                                                                     OnChainHelpers.isScriptAddress address && OnChainHelpers.getUnsafeScriptHash_In_Address address == swapOffer_Validator_Hash
+                        --     ]
                         !inputs_Own_TxOuts =
                             [ LedgerApiV2.txInInfoResolved txInfoInput | !txInfoInput <- LedgerApiV2.txInfoInputs info, let
                                                                                                                             address = LedgerApiV2.txOutAddress (LedgerApiV2.txInInfoResolved txInfoInput)
@@ -93,6 +99,12 @@ mkPolicyID (T.PolicyParams !protocolPolicyID_CS !swapOffer_Validator_Hash) !redR
                                                                                                                             OnChainHelpers.isScriptAddress address && address == swapOffer_Validator_Address
                             ]
                         ------------------
+                        -- !outputs_Own_TxOuts =
+                        --     [ txOut | !txOut <- LedgerApiV2.txInfoOutputs info, let
+                        --                                                             address = LedgerApiV2.txOutAddress txOut
+                        --                                                         in
+                        --                                                             OnChainHelpers.isScriptAddress address && OnChainHelpers.getUnsafeScriptHash_In_Address address == swapOffer_Validator_Hash
+                        --     ]
                         !outputs_Own_TxOuts =
                             [ txOut | !txOut <- LedgerApiV2.txInfoOutputs info, let
                                                                                     address = LedgerApiV2.txOutAddress txOut
@@ -230,6 +242,7 @@ mkPolicyID (T.PolicyParams !protocolPolicyID_CS !swapOffer_Validator_Hash) !redR
 
 --------------------------------------------------------------------------------2
 
+{-# INLINEABLE mkValidator #-}
 mkValidator :: T.ValidatorParams -> BuiltinData -> BuiltinData -> BuiltinData -> ()
 mkValidator (T.ValidatorParams !protocolPolicyID_CS !tokenEmergencyAdminPolicy_CS) !datumRaw !redRaw !ctxRaw =
     let
@@ -271,7 +284,14 @@ mkValidator (T.ValidatorParams !protocolPolicyID_CS !tokenEmergencyAdminPolicy_C
                     ------------------
                     !input_TxOut_BeingValidated = OnChainHelpers.getUnsafe_Own_Input_TxOut ctx
                     !swapOffer_Validator_Address = LedgerApiV2.txOutAddress input_TxOut_BeingValidated
+                    -- !swapOffer_Validator_Hash = OnChainHelpers.getUnsafeScriptHash_In_Address swapOffer_Validator_Address
                     ------------------
+                    -- !inputs_Own_TxOuts =
+                    --     [ LedgerApiV2.txInInfoResolved txInfoInput | !txInfoInput <- LedgerApiV2.txInfoInputs info, let
+                    --                                                                                                     address = LedgerApiV2.txOutAddress (LedgerApiV2.txInInfoResolved txInfoInput)
+                    --                                                                                                 in
+                    --                                                                                                     OnChainHelpers.isScriptAddress address && OnChainHelpers.getUnsafeScriptHash_In_Address address == swapOffer_Validator_Hash
+                    --     ]
                     !inputs_Own_TxOuts =
                         [ LedgerApiV2.txInInfoResolved txInfoInput | !txInfoInput <- LedgerApiV2.txInfoInputs info, let
                                                                                                                         address = LedgerApiV2.txOutAddress (LedgerApiV2.txInInfoResolved txInfoInput)
@@ -349,6 +369,12 @@ mkValidator (T.ValidatorParams !protocolPolicyID_CS !tokenEmergencyAdminPolicy_C
                                 [ LedgerApiV2.txInInfoResolved txInfoInput | !txInfoInput <- LedgerApiV2.txInfoReferenceInputs info, OnChainHelpers.isScriptAddress (LedgerApiV2.txOutAddress $ LedgerApiV2.txInInfoResolved txInfoInput)
                                 ]
                             ------------------
+                            -- !outputs_Own_TxOuts =
+                            --     [ txOut | !txOut <- LedgerApiV2.txInfoOutputs info, let
+                            --                                                             address = LedgerApiV2.txOutAddress txOut
+                            --                                                         in
+                            --                                                             OnChainHelpers.isScriptAddress address && OnChainHelpers.getUnsafeScriptHash_In_Address address == swapOffer_Validator_Hash
+                            --     ]
                             !outputs_Own_TxOuts =
                                 [ txOut | !txOut <- LedgerApiV2.txInfoOutputs info, let
                                                                                         address = LedgerApiV2.txOutAddress txOut
@@ -447,7 +473,7 @@ mkValidator (T.ValidatorParams !protocolPolicyID_CS !tokenEmergencyAdminPolicy_C
                                 ---------------------
                                 -- it runs alone
                                 ---------------------
-                                    traceIfFalse "not isInRange commissionSwapOffer_InBPx1e3" (ProtocolT.isInRange commissionSwapOffer_InBPx1e3 newCommissionRate)
+                                traceIfFalse "not isInRange commissionSwapOffer_InBPx1e3" (ProtocolT.isInRange commissionSwapOffer_InBPx1e3 newCommissionRate)
                                     && traceIfFalse "not isCorrect_Output_SwapOffer_Datum_With_CommissionChanged" isCorrect_Output_SwapOffer_Datum_With_CommissionChanged
                                     && traceIfFalse "not isCorrect_Output_SwapOffer_Value_NotChanged" isCorrect_Output_SwapOffer_Value_NotChanged
                                 where

@@ -290,7 +290,7 @@ deploy_Protocol_And_FundFactory protocolPolicyID_TxOutRef tokenEmergencyAdminPol
     SystemDirectory.removePathForcibly (path SystemFilePathPosix.</> protocolName)
     SystemDirectory.createDirectoryIfMissing True (path SystemFilePathPosix.</> protocolName)
     ------------------------------
-    MonadIOClass.liftIO $ P.putStrLn "Generating Protocol Deploy File..."
+    MonadIOClass.liftIO $ P.putStrLn "Generating Protocol Deploy File 3333..."
     ------------------------------
     P.putStrLn $ "Path: " ++ path SystemFilePathPosix.</> protocolName
     ------------------------------
@@ -398,6 +398,7 @@ deploy_Protocol_And_FundFactory protocolPolicyID_TxOutRef tokenEmergencyAdminPol
         delegationValidatorParams =
             DelegationT.ValidatorParams
                 { DelegationT.vpProtocolPolicyID_CS = protocolPolicyID_CS
+                , DelegationT.vpTokenEmergencyAdminPolicy_CS = tokenEmergencyAdminPolicy_CS
                 }
         delegationValidator = DelegationOnChain.validator delegationValidatorParams
         delegationValidator_Hash = OffChainHelpers.hashValidator delegationValidator
@@ -1007,6 +1008,10 @@ deploy_PRE path name swOverWrite = do
             T.DeployAllPreParams
                 { T.dapProtocolVersion = ProtocolT.protocolVersion
                 , T.dapFundVersion = FundT.fundVersion
+                , T.dapSwapOfferVersion = SwapOfferT.swapOfferVersion
+                , T.dapBuyOrderVersion = BuyOrderT.buyOrderVersion
+                , T.dapDelegationVersion = DelegationT.delegationVersion
+                , T.dapScriptVersion = ScriptT.scriptVersion
                 , T.dapProtocolPolicyID_Pre_CborHex = OffChainHelpers.lazyByteStringToString protocolPolicyID_Pre_CborHex
                 , T.dapProtocolValidator_Pre_CborHex = OffChainHelpers.lazyByteStringToString protocolValidator_Pre_CborHex
                 , T.dapScriptPolicyID_Pre_CborHex = OffChainHelpers.lazyByteStringToString scriptPolicyID_Pre_CborHex

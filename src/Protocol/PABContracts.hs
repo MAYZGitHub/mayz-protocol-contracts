@@ -72,8 +72,8 @@ type ProtocolSchema =
         PlutusContract..\/ PlutusContract.Endpoint "endPointFundReIndexing" T.PABFundReIndexingParams
 
         PlutusContract..\/ PlutusContract.Endpoint "endPointFundCollect_Protocol_Commission" T.PABFundCollect_Protocol_CommissionParams
-        PlutusContract..\/ PlutusContract.Endpoint "endPointFundCollect_Delegators_Commission" T.PABFundCollect_Delegators_CommissionParams
         PlutusContract..\/ PlutusContract.Endpoint "endPointFundCollect_Managers_Commission" T.PABFundCollect_Managers_CommissionParams
+        PlutusContract..\/ PlutusContract.Endpoint "endPointFundCollect_Delegators_Commission" T.PABFundCollect_Delegators_CommissionParams
 
 protocolEndPoints :: PlutusContract.Contract () ProtocolSchema DataText.Text ()
 protocolEndPoints =
@@ -102,8 +102,8 @@ protocolEndPoints =
             `PlutusContract.select` endPointFundReIndexing'
 
             `PlutusContract.select` endPointFundCollect_Protocol_Commission'
-            `PlutusContract.select` endPointFundCollect_Delegators_Commission'
             `PlutusContract.select` endPointFundCollect_Managers_Commission'
+            `PlutusContract.select` endPointFundCollect_Delegators_Commission'
         )
         >> protocolEndPoints
     where
@@ -132,8 +132,8 @@ protocolEndPoints =
         endPointFundReIndexing' = PlutusContract.endpoint @"endPointFundReIndexing" OffChain.endPointFundReIndexing
 
         endPointFundCollect_Protocol_Commission' = PlutusContract.endpoint @"endPointFundCollect_Protocol_Commission" OffChain.endPointFundCollect_Protocol_Commission
-        endPointFundCollect_Delegators_Commission' = PlutusContract.endpoint @"endPointFundCollect_Delegators_Commission" OffChain.endPointFundCollect_Delegators_Commission
         endPointFundCollect_Managers_Commission' = PlutusContract.endpoint @"endPointFundCollect_Managers_Commission" OffChain.endPointFundCollect_Managers_Commission
+        endPointFundCollect_Delegators_Commission' = PlutusContract.endpoint @"endPointFundCollect_Delegators_Commission" OffChain.endPointFundCollect_Delegators_Commission
 
 PlaygroundContract.mkSchemaDefinitions ''ProtocolSchema
 
@@ -160,8 +160,8 @@ data PABContracts
     | PABFundWithdraw T.PABFundWithdrawParams
     | PABFundReIndexing T.PABFundReIndexingParams
     | PABFundCollect_Protocol_Commission T.PABFundCollect_Protocol_CommissionParams
-    | PABFundCollect_Delegators_Commission T.PABFundCollect_Delegators_CommissionParams
     | PABFundCollect_Managers_Commission T.PABFundCollect_Managers_CommissionParams
+    | PABFundCollect_Delegators_Commission T.PABFundCollect_Delegators_CommissionParams
     deriving (DataAeson.FromJSON, DataAeson.ToJSON, DataOpenApiSchema.ToSchema, GHCGenerics.Generic, P.Eq, P.Ord, P.Show)
 
 instance Prettyprinter.Pretty PABContracts where
@@ -231,8 +231,8 @@ instance PABEffectsContractBuiltin.HasDefinitions PABContracts where
     getContract (PABFundReIndexing params)                    = PABEffectsContractBuiltin.SomeBuiltin $ OffChain.endPointFundReIndexing @() @PABEffectsContractBuiltin.Empty params
 
     getContract (PABFundCollect_Protocol_Commission params)   = PABEffectsContractBuiltin.SomeBuiltin $ OffChain.endPointFundCollect_Protocol_Commission @() @PABEffectsContractBuiltin.Empty params
-    getContract (PABFundCollect_Delegators_Commission params) = PABEffectsContractBuiltin.SomeBuiltin $ OffChain.endPointFundCollect_Delegators_Commission @() @PABEffectsContractBuiltin.Empty params
     getContract (PABFundCollect_Managers_Commission params)   = PABEffectsContractBuiltin.SomeBuiltin $ OffChain.endPointFundCollect_Managers_Commission @() @PABEffectsContractBuiltin.Empty params
+    getContract (PABFundCollect_Delegators_Commission params) = PABEffectsContractBuiltin.SomeBuiltin $ OffChain.endPointFundCollect_Delegators_Commission @() @PABEffectsContractBuiltin.Empty params
 
     getSchema = const $ PABEffectsContractBuiltin.endpointsToSchemas @PABEffectsContractBuiltin.Empty
 

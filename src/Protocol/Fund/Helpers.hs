@@ -72,10 +72,11 @@ mkUpdated_Fund_Datum_With_HoldingDeleted !fundDatum_In =
 mkUpdated_FundHolding_Datum_With_Deposit :: FundHoldingT.FundHoldingDatumType -> Integer -> Integer -> Integer -> Integer -> FundHoldingT.FundHoldingDatumType
 mkUpdated_FundHolding_Datum_With_Deposit !fundHoldingDatum_In !mintingFT !_deliverFT !commissionsPayed !commissions_FT_Release_PerMonth_1e6 =
     fundHoldingDatum_In
-        { FundHoldingT.hdSubtotal_FT_Minted_Accumulated = FundHoldingT.hdSubtotal_FT_Minted_Accumulated fundHoldingDatum_In + mintingFT
-        , FundHoldingT.hdSubtotal_FT_Minted = FundHoldingT.hdSubtotal_FT_Minted fundHoldingDatum_In + mintingFT
-        , FundHoldingT.hdSubtotal_FT_Commissions = FundHoldingT.hdSubtotal_FT_Commissions fundHoldingDatum_In + commissionsPayed
-        , FundHoldingT.hdSubtotal_FT_Commissions_Release_PerMonth_1e6 = FundHoldingT.hdSubtotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In + commissions_FT_Release_PerMonth_1e6
+        { FundHoldingT.hdSubTotal_FT_Minted_Accumulated = FundHoldingT.hdSubTotal_FT_Minted_Accumulated fundHoldingDatum_In + mintingFT
+        , FundHoldingT.hdSubTotal_FT_Minted = FundHoldingT.hdSubTotal_FT_Minted fundHoldingDatum_In + mintingFT
+        , FundHoldingT.hdSubTotal_FT_Commissions = FundHoldingT.hdSubTotal_FT_Commissions fundHoldingDatum_In + commissionsPayed
+        , FundHoldingT.hdSubTotal_FT_Commissions_Total = FundHoldingT.hdSubTotal_FT_Commissions_Total fundHoldingDatum_In + commissionsPayed
+        , FundHoldingT.hdSubTotal_FT_Commissions_Release_PerMonth_1e6 = FundHoldingT.hdSubTotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In + commissions_FT_Release_PerMonth_1e6
         }
 
 --------------------------------------------------------------------------------2
@@ -84,9 +85,10 @@ mkUpdated_FundHolding_Datum_With_Deposit !fundHoldingDatum_In !mintingFT !_deliv
 mkUpdated_FundHolding_Datum_With_Withdraw :: FundHoldingT.FundHoldingDatumType -> Integer -> Integer -> Integer -> FundHoldingT.FundHoldingDatumType
 mkUpdated_FundHolding_Datum_With_Withdraw !fundHoldingDatum_In !withdraw !commissionsForUserFTToGetBack !commissions_FT_Release_PerMonth_1e6 =
     fundHoldingDatum_In
-        { FundHoldingT.hdSubtotal_FT_Minted = FundHoldingT.hdSubtotal_FT_Minted fundHoldingDatum_In - withdraw - commissionsForUserFTToGetBack
-        , FundHoldingT.hdSubtotal_FT_Commissions = FundHoldingT.hdSubtotal_FT_Commissions fundHoldingDatum_In - commissionsForUserFTToGetBack
-        , FundHoldingT.hdSubtotal_FT_Commissions_Release_PerMonth_1e6 = FundHoldingT.hdSubtotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In - commissions_FT_Release_PerMonth_1e6
+        { FundHoldingT.hdSubTotal_FT_Minted = FundHoldingT.hdSubTotal_FT_Minted fundHoldingDatum_In - withdraw - commissionsForUserFTToGetBack
+        , FundHoldingT.hdSubTotal_FT_Commissions = FundHoldingT.hdSubTotal_FT_Commissions fundHoldingDatum_In - commissionsForUserFTToGetBack
+        , FundHoldingT.hdSubTotal_FT_Commissions_Total = FundHoldingT.hdSubTotal_FT_Commissions_Total fundHoldingDatum_In - commissionsForUserFTToGetBack
+        , FundHoldingT.hdSubTotal_FT_Commissions_Release_PerMonth_1e6 = FundHoldingT.hdSubTotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In - commissions_FT_Release_PerMonth_1e6
         }
 
 --------------------------------------------------------------------------------2
@@ -95,8 +97,8 @@ mkUpdated_FundHolding_Datum_With_Withdraw !fundHoldingDatum_In !withdraw !commis
 mkUpdated_FundHolding_Datum_With_Collect_Protocol_Commission :: FundHoldingT.FundHoldingDatumType -> Integer -> FundHoldingT.FundHoldingDatumType
 mkUpdated_FundHolding_Datum_With_Collect_Protocol_Commission !fundHoldingDatum_In !withdraw =
     fundHoldingDatum_In
-        { FundHoldingT.hdSubtotal_FT_Commissions = FundHoldingT.hdSubtotal_FT_Commissions fundHoldingDatum_In - withdraw
-        , FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol = FundHoldingT.hdSubtotal_FT_Commissions_Collected_Protocol fundHoldingDatum_In + withdraw
+        { FundHoldingT.hdSubTotal_FT_Commissions = FundHoldingT.hdSubTotal_FT_Commissions fundHoldingDatum_In - withdraw
+        , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol = FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol fundHoldingDatum_In + withdraw
         }
 
 --------------------------------------------------------------------------------2
@@ -105,8 +107,8 @@ mkUpdated_FundHolding_Datum_With_Collect_Protocol_Commission !fundHoldingDatum_I
 mkUpdated_FundHolding_Datum_With_Collect_Managers_Commission :: FundHoldingT.FundHoldingDatumType -> Integer -> FundHoldingT.FundHoldingDatumType
 mkUpdated_FundHolding_Datum_With_Collect_Managers_Commission !fundHoldingDatum_In !withdraw =
     fundHoldingDatum_In
-        { FundHoldingT.hdSubtotal_FT_Commissions = FundHoldingT.hdSubtotal_FT_Commissions fundHoldingDatum_In - withdraw
-        , FundHoldingT.hdSubtotal_FT_Commissions_Collected_Managers = FundHoldingT.hdSubtotal_FT_Commissions_Collected_Managers fundHoldingDatum_In + withdraw
+        { FundHoldingT.hdSubTotal_FT_Commissions = FundHoldingT.hdSubTotal_FT_Commissions fundHoldingDatum_In - withdraw
+        , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Managers = FundHoldingT.hdSubTotal_FT_Commissions_Collected_Managers fundHoldingDatum_In + withdraw
         }
 
 --------------------------------------------------------------------------------2
@@ -115,8 +117,8 @@ mkUpdated_FundHolding_Datum_With_Collect_Managers_Commission !fundHoldingDatum_I
 mkUpdated_FundHolding_Datum_With_Collect_Delegators_Commission :: FundHoldingT.FundHoldingDatumType -> Integer -> FundHoldingT.FundHoldingDatumType
 mkUpdated_FundHolding_Datum_With_Collect_Delegators_Commission !fundHoldingDatum_In !withdraw =
     fundHoldingDatum_In
-        { FundHoldingT.hdSubtotal_FT_Commissions = FundHoldingT.hdSubtotal_FT_Commissions fundHoldingDatum_In - withdraw
-        , FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators = FundHoldingT.hdSubtotal_FT_Commissions_Collected_Delegators fundHoldingDatum_In + withdraw
+        { FundHoldingT.hdSubTotal_FT_Commissions = FundHoldingT.hdSubTotal_FT_Commissions fundHoldingDatum_In - withdraw
+        , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators = FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators fundHoldingDatum_In + withdraw
         }
 
 --------------------------------------------------------------------------------
@@ -125,12 +127,20 @@ mkUpdated_FundHolding_Datum_With_Collect_Delegators_Commission !fundHoldingDatum
 mkUpdated_FundHolding_Datum_With_MinADAChanged :: FundHoldingT.FundHoldingDatumType -> Integer -> FundHoldingT.FundHoldingDatumType
 mkUpdated_FundHolding_Datum_With_MinADAChanged !fundHoldingDatum_In !newMinADA = fundHoldingDatum_In {FundHoldingT.hdMinADA = newMinADA}
 
-{-# INLINEABLE mkUpdated_FundHolding_Datum_With_CommissionsMoved #-}
-mkUpdated_FundHolding_Datum_With_CommissionsMoved :: FundHoldingT.FundHoldingDatumType -> Integer -> Integer -> FundHoldingT.FundHoldingDatumType
-mkUpdated_FundHolding_Datum_With_CommissionsMoved !fundHoldingDatum_In !newCommissions !commissions_FT_Release_PerMonth_1e6 =
+--------------------------------------------------------------------------------
+
+{-# INLINEABLE mkUpdated_FundHolding_Datum_AfterBalancing #-}
+mkUpdated_FundHolding_Datum_AfterBalancing :: FundHoldingT.FundHoldingDatumType -> Integer ->  Integer ->  Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> FundHoldingT.FundHoldingDatumType
+mkUpdated_FundHolding_Datum_AfterBalancing !fundHoldingDatum_In !newMinted !newMintedAcum !newCommissions !newCommissionsTotal !newCommissions_FT_Release_PerMonth_1e6 !newCollectProtocol !newCollectManagers !newCollectDelegators =
     fundHoldingDatum_In
-        { FundHoldingT.hdSubtotal_FT_Commissions = newCommissions
-        , FundHoldingT.hdSubtotal_FT_Commissions_Release_PerMonth_1e6 = commissions_FT_Release_PerMonth_1e6
+        { FundHoldingT.hdSubTotal_FT_Commissions = newCommissions
+        , FundHoldingT.hdSubTotal_FT_Commissions_Total = newCommissionsTotal
+        , FundHoldingT.hdSubTotal_FT_Commissions_Release_PerMonth_1e6 = newCommissions_FT_Release_PerMonth_1e6
+        , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Protocol = newCollectProtocol
+        , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Managers = newCollectManagers
+        , FundHoldingT.hdSubTotal_FT_Commissions_Collected_Delegators = newCollectDelegators
+        , FundHoldingT.hdSubTotal_FT_Minted = newMinted
+        , FundHoldingT.hdSubTotal_FT_Minted_Accumulated = newMintedAcum
         }
 
 --------------------------------------------------------------------------------2
@@ -194,6 +204,22 @@ calculateDepositCommissionsUsingMonths commissions_Table_Numerator_1e6 deadline 
         !userFT = TxRatio.truncate (TxRatio.unsafeRatio (commissionsAcumulated_Numerator_1e6 * deposit) 1_000_000)
         ------------------
         !commissionsFT = deposit - userFT
+        ------------------
+        -- !commissions_FT_Release_PerMonth
+        --     | monthsRemaining == 0 = TxRatio.fromInteger 0
+        --     | otherwise = TxRatio.unsafeRatio commissionsFT monthsRemaining
+        -- !commissions_FT_Release_PerMonth_1e6 = OnChainHelpers.setAndLoosePrecision1e6GetOnlyNumerator commissions_FT_Release_PerMonth
+        ------------------
+        !commissions_FT_Release_PerMonth_1e6 = calculateRelease monthsRemaining commissionsFT
+
+--------------------------------------------------------------------------------2
+
+{-# INLINEABLE calculateRelease #-}
+calculateRelease :: Integer -> Integer -> Integer
+calculateRelease monthsRemaining commissionsFT = commissions_FT_Release_PerMonth_1e6
+    where
+        -- !monthsRemaining = getRemainingMonths deadline date
+        ------------------
         !commissions_FT_Release_PerMonth
             | monthsRemaining == 0 = TxRatio.fromInteger 0
             | otherwise = TxRatio.unsafeRatio commissionsFT monthsRemaining
@@ -201,6 +227,7 @@ calculateDepositCommissionsUsingMonths commissions_Table_Numerator_1e6 deadline 
 
 --------------------------------------------------------------------------------2
 
+-- NOTE: este metdoo ya no se usa onchain, se dividio en dos y se usan el de bajo, pero si se usa en testings
 {-# INLINEABLE calculateWithdrawCommissionsUsingMonths #-}
 calculateWithdrawCommissionsUsingMonths :: [Integer] -> LedgerApiV2.POSIXTime -> LedgerApiV2.POSIXTime -> Integer -> Integer -> (Integer, Integer, Integer)
 calculateWithdrawCommissionsUsingMonths commissions_Table_Numerator_1e6 deadline date withdraw investUnit_Granularity
@@ -242,18 +269,22 @@ calculateWithdrawCommissionsUsingMonths commissions_Table_Numerator_1e6 deadline
         -- Recalcular commissionsForUserFTToGetBack basado en el valor ajustado
         !commissionsForUserFTToGetBack = withdraw - userFT'forCalculationsOfCommissionsToGetBackAdjusted
         !withdrawPlusCommissionsGetBack = withdraw + commissionsForUserFTToGetBack
-        !commissions_FT_Release_PerMonth
-            | monthsRemaining == 0 = TxRatio.fromInteger 0
-            | otherwise = TxRatio.unsafeRatio commissionsForUserFTToGetBack monthsRemaining
-        !commissions_FT_Release_PerMonth_1e6 = OnChainHelpers.setAndLoosePrecision1e6GetOnlyNumerator commissions_FT_Release_PerMonth
+        -- !commissions_FT_Release_PerMonth
+        --     | monthsRemaining == 0 = TxRatio.fromInteger 0
+        --     | otherwise = TxRatio.unsafeRatio commissionsForUserFTToGetBack monthsRemaining
+        -- !commissions_FT_Release_PerMonth_1e6 = OnChainHelpers.setAndLoosePrecision1e6GetOnlyNumerator commissions_FT_Release_PerMonth
+        ------------------
+        !commissions_FT_Release_PerMonth_1e6 = calculateRelease monthsRemaining commissionsForUserFTToGetBack
+
+--------------------------------------------------------------------------------2
 
 {-# INLINEABLE calculateWithdrawCommissionsAvailable #-}
-calculateWithdrawCommissionsAvailable :: [Integer] -> LedgerApiV2.POSIXTime -> LedgerApiV2.POSIXTime -> Integer -> Integer -> Integer
-calculateWithdrawCommissionsAvailable commissions_Table_Numerator_1e6 deadline date withdraw investUnit_Granularity
+calculateWithdrawCommissionsAvailable :: [Integer] -> Integer -> Integer -> Integer -> Integer
+calculateWithdrawCommissionsAvailable commissions_Table_Numerator_1e6 monthsRemaining withdraw investUnit_Granularity
     | withdraw < 0 = traceError "Withdraw cannot be negative"
     | otherwise = commissionsForUserFTToGetBack
     where
-        !monthsRemaining = getRemainingMonths deadline date
+        -- !monthsRemaining = getRemainingMonths deadline date
         ------------------
         !commissionsAcumulatedNotIncludingThisPeriod_Numerator_1e6 = commissions_Table_Numerator_1e6 !! monthsRemaining
         !userFT'forCalculationsOfCommissionsToGetBack = TxRatio.truncate (TxRatio.unsafeRatio (commissionsAcumulatedNotIncludingThisPeriod_Numerator_1e6 * withdraw) 1_000_000)
@@ -263,17 +294,6 @@ calculateWithdrawCommissionsAvailable commissions_Table_Numerator_1e6 deadline d
         -- Recalcular commissionsForUserFTToGetBack basado en el valor ajustado
         !commissionsForUserFTToGetBack = withdraw - userFT'forCalculationsOfCommissionsToGetBackAdjusted
 
-{-# INLINEABLE calculateWithdrawCommissionsRelease #-}
-calculateWithdrawCommissionsRelease :: LedgerApiV2.POSIXTime -> LedgerApiV2.POSIXTime -> Integer -> Integer
-calculateWithdrawCommissionsRelease deadline date commissionsForUserFTToGetBack = commissions_FT_Release_PerMonth_1e6
-    where
-        !monthsRemaining = getRemainingMonths deadline date
-        ------------------
-        !commissions_FT_Release_PerMonth
-            | monthsRemaining == 0 = TxRatio.fromInteger 0
-            | otherwise = TxRatio.unsafeRatio commissionsForUserFTToGetBack monthsRemaining
-        !commissions_FT_Release_PerMonth_1e6 = OnChainHelpers.setAndLoosePrecision1e6GetOnlyNumerator commissions_FT_Release_PerMonth
-
 --------------------------------------------------------------------------------2
 
 {-# INLINEABLE getCommissionsAvailable #-}
@@ -281,8 +301,8 @@ getCommissionsAvailable :: LedgerApiV2.POSIXTime -> FundHoldingT.FundHoldingDatu
 getCommissionsAvailable deadline fundHoldingDatum_In shareBPx1e2 taken date =
     let
         !monthsRemainingRational = getRemainingMonths deadline date
-        !totalCommisions = FundHoldingT.hdSubtotal_FT_Commissions fundHoldingDatum_In
-        !release_PerMonth = TxRatio.unsafeRatio (FundHoldingT.hdSubtotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In) 1_000_000
+        !totalCommisions = FundHoldingT.hdSubTotal_FT_Commissions_Total fundHoldingDatum_In
+        !release_PerMonth = TxRatio.unsafeRatio (FundHoldingT.hdSubTotal_FT_Commissions_Release_PerMonth_1e6 fundHoldingDatum_In) 1_000_000
         !commisionsReady = TxRatio.fromInteger totalCommisions - (TxRatio.fromInteger monthsRemainingRational * release_PerMonth)
         -- shareBPx1e2 = shareBP * 100
         -- 1BP to decimal 1/10_000
