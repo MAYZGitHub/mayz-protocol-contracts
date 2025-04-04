@@ -76,8 +76,6 @@ mkPolicyID (T.PolicyParams !fundPolicy_CS) !redRaw !ctxRaw =
                     && traceIfFalse "not isCorrect_Output_FundHolding_Value" isCorrect_Output_FundHolding_Value
                 where
                     ------------------
-
-                    ------------------
                     !outputs_txOuts =
                         [ txOut | !txOut <- LedgerApiV2.txInfoOutputs info, OnChainHelpers.isScriptAddress (LedgerApiV2.txOutAddress txOut)
                         ]
@@ -172,8 +170,6 @@ mkPolicyID (T.PolicyParams !fundPolicy_CS) !redRaw !ctxRaw =
                     && traceIfFalse "not isCorrect_Redeemer_FundHolding" (isCorrect_Redeemer_FundHolding isFundHoldingValidatorRedeemerDelete)
                     && traceIfFalse "not isZeroAssets" isZeroAssets
                 where
-                    ------------------
-
                     ------------------
                     !input_TxOutRef_TxOut_And_FundHoldingDatum =
                         case OnChainHelpers.getTxOutRefs_TxOuts_And_DatumTypes_From_TxOutRefs_TxOuts_By_CS
@@ -916,8 +912,6 @@ mkValidator (T.ValidatorParams !protocolPolicyID_CS !fundPolicy_CS !tokenEmergen
                                                                     && traceIfFalse "wrong output value" (isCorrect_Output_FundHolding_Value valueOf_FundHoldingDatum_Out $ getValueFor_FundHoldingDatum_Control_Without_FT_for_Commissions withdraw)
                                                                 where
                                                                     ------------------
-
-                                                                    ------------------
                                                                     !getShare = ProtocolT.pdShare_InBPx1e2_Protocol
                                                                     !getTaken = T.hdSubTotal_FT_Commissions_Collected_Protocol
                                                                     ------------------
@@ -940,8 +934,6 @@ mkValidator (T.ValidatorParams !protocolPolicyID_CS !fundPolicy_CS !tokenEmergen
                                                                     && traceIfFalse "wrong output value" (isCorrect_Output_FundHolding_Value valueOf_FundHoldingDatum_Out $ getValueFor_FundHoldingDatum_Control_Without_FT_for_Commissions withdraw)
                                                                 where
                                                                     ------------------
-
-                                                                    ------------------
                                                                     !getShare = ProtocolT.pdShare_InBPx1e2_Managers
                                                                     !getTaken = T.hdSubTotal_FT_Commissions_Collected_Managers
                                                                     ------------------
@@ -960,8 +952,6 @@ mkValidator (T.ValidatorParams !protocolPolicyID_CS !fundPolicy_CS !tokenEmergen
                                                                     && traceIfFalse "wrong output value" (isCorrect_Output_FundHolding_Value valueOf_FundHoldingDatum_Out $ getValueFor_FundHoldingDatum_Control_Without_FT_for_Commissions withdraw)
                                                                 where
                                                                     ------------------
-
-                                                                    ------------------
                                                                     !getShare = ProtocolT.pdShare_InBPx1e2_Delegators
                                                                     !getTaken = T.hdSubTotal_FT_Commissions_Collected_Delegators
                                                                     ------------------
@@ -971,8 +961,6 @@ mkValidator (T.ValidatorParams !protocolPolicyID_CS !fundPolicy_CS !tokenEmergen
                                                             ------------------
                                                             _ -> False
                                                         where
-                                                            ------------------
-
                                                             ------------------
                                                             !protocolID_AC = LedgerValue.AssetClass (protocolPolicyID_CS, T.protocolID_TN)
                                                             ------------------
