@@ -5,19 +5,19 @@ This document outlines the technical and operational complexities behind the **r
 
 ---
 
-## 🧩 What is an Investment Unit (UI)?
+## 🧩 What is an Investment Unit (IU)?
 
-An **Investment Unit (UI)** is a fixed basket of tokens with specific proportions.
+An **Investment Unit (IU)** is a fixed basket of tokens with specific proportions.
 
 - Users do **not** interact directly with tokens.
-- Instead, they interact with **amounts of UI**.
-- When users **deposit or withdraw**, they are essentially moving **`X` amount of UI**, and the protocol handles the underlying tokens automatically.
+- Instead, they interact with **amounts of IU**.
+- When users **deposit or withdraw**, they are essentially moving **`X` amount of IU**, and the protocol handles the underlying tokens automatically.
 
 ```
 Real tokens moved = number_of_UIs × composition_of_each_UI
 ```
 
-This means that **any change to the UI composition** (which is what reindexing does) must be compatible with the total number of UIs in existence.
+This means that **any change to the IU composition** (which is what reindexing does) must be compatible with the total number of UIs in existence.
 
 ---
 
@@ -25,12 +25,12 @@ This means that **any change to the UI composition** (which is what reindexing d
 
 Reindexing is the process that:
 
-- **Modifies the composition of the UI** (changing which tokens and in what proportion).
-- **Updates the actual token holdings** in the Fund Holdings (FHs) to match the new UI.
+- **Modifies the composition of the IU** (changing which tokens and in what proportion).
+- **Updates the actual token holdings** in the Fund Holdings (FHs) to match the new IU.
 
 In other words:
 
-> Reindexing changes **what each UI means**, and ensures the real tokens across the system are updated to reflect this new definition.
+> Reindexing changes **what each IU means**, and ensures the real tokens across the system are updated to reflect this new definition.
 
 ---
 
@@ -38,7 +38,7 @@ In other words:
 
 When a user deposits or withdraws:
 
-- They are not moving "UI" directly.
+- They are not moving "IU" directly.
 - Instead, they are depositing or withdrawing the **full token composition** of one or more UIs.
 
 So, for any operation to be valid:
@@ -51,9 +51,9 @@ token_amount_per_UI × number_of_UIs = integer
 
 ---
 
-## 🧮 Why Allow Decimals in the UI?
+## 🧮 Why Allow Decimals in the IU?
 
-Even though tokens are stored as integers, MAYZ allows **up to 2 decimal places** in the token values defined in a UI, to:
+Even though tokens are stored as integers, MAYZ allows **up to 2 decimal places** in the token values defined in a IU, to:
 
 - Facilitate reindexing without requiring huge token movements.
 - Provide more **granular control** over proportions.
@@ -69,15 +69,15 @@ Allowing more decimal places introduces stricter limitations.
 
 📌 Example:
 
-- UI defines `0.01` of a token.
+- IU defines `0.01` of a token.
 - You want to withdraw `1 token`.
-- You need to withdraw `100 UI` → `0.01 × 100 = 1.00` ✅
+- You need to withdraw `100 IU` → `0.01 × 100 = 1.00` ✅
 
 ---
 
 ## 🎯 Ideal Case: No Decimals at All
 
-The ideal setup is that **each UI has only whole numbers** for all tokens.
+The ideal setup is that **each IU has only whole numbers** for all tokens.
 
 Advantages:
 
@@ -87,16 +87,16 @@ Advantages:
 
 ---
 
-## 💡 UI Design Tip: Use Large Quantities Per Token
+## 💡 IU Design Tip: Use Large Quantities Per Token
 
 Why?
 
-If the **minimum editable value per token** is `x_min`, and the token amount in the UI is small:
+If the **minimum editable value per token** is `x_min`, and the token amount in the IU is small:
 
-- A token with 10 units in the UI and `x_min = 1.00` → **10% minimum change**
+- A token with 10 units in the IU and `x_min = 1.00` → **10% minimum change**
 - A token with 1,000,000 units and `x_min = 1.00` → **0.0001% minimum change**
 
-Larger token amounts in the UI give:
+Larger token amounts in the IU give:
 
 - More precise reindexing.
 - Lower operational cost.
@@ -129,12 +129,12 @@ Each fund can have **one or multiple Fund Holdings** — smart contracts that ho
 
 ### 2. 💧 Liquidity
 
-- Any change in the UI is **multiplied by the total number of UIs minted**.
-- So, even a small change in the UI can require large liquidity if many UIs exist.
+- Any change in the IU is **multiplied by the total number of UIs minted**.
+- So, even a small change in the IU can require large liquidity if many UIs exist.
 
-#### Why we introduced decimals in UI
+#### Why we introduced decimals in IU
 
-To **allow changes that move small amounts of tokens** during reindex, MAYZ allows up to **2 decimal places** in the token quantities defined in a UI.
+To **allow changes that move small amounts of tokens** during reindex, MAYZ allows up to **2 decimal places** in the token quantities defined in a IU.
 
 - Without decimals, a small change would require handling very large token amounts.
 - With 2 decimals, reindexing can operate with fractional changes, reducing required liquidity per reindex operation.
@@ -151,11 +151,11 @@ token_amount_per_UI × number_of_UI
 
 must always be an integer.
 
-That means: if you define a token with `0.01` in the UI, and there are 101 UIs, the result `0.01 × 101 = 1.01` is invalid. It must be a whole number.
+That means: if you define a token with `0.01` in the IU, and there are 101 UIs, the result `0.01 × 101 = 1.01` is invalid. It must be a whole number.
 
 #### ✅ Minimum change allowed in reindexing:
 
-This is **the minimum valid number that can be used in editing the UI** during a reindex operation.
+This is **the minimum valid number that can be used in editing the IU** during a reindex operation.
 
 ```
 x_min = 1 / gcd(100, N)
@@ -209,11 +209,11 @@ This ensures users do not receive more tokens than they contribute. If a reindex
 | Topic           | Complexity                                                               | Recommendation / Solution                                     |
 |----------------|---------------------------------------------------------------------------|----------------------------------------------------------------|
 | Fund Holdings   | Reindex uses only one FH; token availability may be fragmented           | Use 1 FH for simplicity, or balance tokens between multiple FHs |
-| Liquidity       | Changes multiply with number of UIs, requiring large token amounts       | Use decimals to reduce token impact per UI                     |
+| Liquidity       | Changes multiply with number of UIs, requiring large token amounts       | Use decimals to reduce token impact per IU                     |
 | Decimal Rules   | Tokens are integers; changes must produce whole numbers                  | Ensure `x × N` is integer. Use `x_min = 1 / gcd(100, N)`       |
 | Improving x_min | `x_min` depends on N; too large = coarse edits only                      | Adjust N to a multiple of 100                                  |
 | Pricing         | Cannot withdraw more value than deposited                                | Validate all token price deltas                                |
 
 ---
 
-For protocol devs and UI designers: reindexing is a low-level operation with high impact. Handling these constraints correctly ensures robust and predictable asset management in MAYZ.
+For protocol devs and IU designers: reindexing is a low-level operation with high impact. Handling these constraints correctly ensures robust and predictable asset management in MAYZ.
